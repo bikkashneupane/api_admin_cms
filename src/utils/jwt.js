@@ -1,15 +1,15 @@
 import JWT from "jsonwebtoken";
-import { insertToken } from "../db/session/sessionModel.js";
+import { insertSession } from "../db/session/sessionModel.js";
 import { updateUser } from "../db/user/userModel.js";
 
 // sign access JWT
 export const signAccessJwt = ({ email }) => {
-  const accessJWT = JWT.sign({ email }, process.env.ACCESS_SECRETE_KEY, {
+  const token = JWT.sign({ email }, process.env.ACCESS_SECRETE_KEY, {
     expiresIn: "10m",
   });
 
-  insertToken({ accessJWT });
-  return accessJWT;
+  insertSession({ token });
+  return token;
 };
 
 // verify access JWT
@@ -23,12 +23,12 @@ export const verifyAccessJwt = (token) => {
 };
 
 // sign refresh JWT
-export const signRefreshJwt = ({ email }) => {
-  const refreshJWT = JWT.sign({ email }, process.env.REFRESH_SECRETE_KEY, {
+export const signRefreshJwt = ({ _id }) => {
+  const refreshJWT = JWT.sign({ _id }, process.env.REFRESH_SECRETE_KEY, {
     expiresIn: "30d",
   });
 
-  updateUser(email, refreshJWT);
+  updateUser({ _id }, { refreshJWT });
   return refreshJWT;
 };
 

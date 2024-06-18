@@ -2,8 +2,21 @@ import { mongoose } from "mongoose";
 
 const schema = new mongoose.Schema(
   {
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    status: {
+      type: String,
+      default: "inactive",
+    },
+    role: {
+      type: String,
+      default: "user",
+    },
     firstName: {
       type: String,
+      maxLength: [100, "First Name Character Length exceeded..."],
       required: true,
     },
     lastName: {
@@ -24,18 +37,14 @@ const schema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    role: {
-      type: String,
-      default: "admin",
-    },
     refreshJWT: {
       type: String,
       default: "",
     },
   },
   {
-    timeStamps: true,
+    timestamps: true,
   }
 );
 
-export default mongoose.model("Admin", schema);
+export default mongoose.model("admin", schema);

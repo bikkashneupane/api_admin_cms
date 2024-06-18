@@ -2,7 +2,7 @@ import { mongoose } from "mongoose";
 
 const schema = new mongoose.Schema(
   {
-    accessJWT: {
+    token: {
       type: String,
       required: true,
     },
@@ -12,7 +12,7 @@ const schema = new mongoose.Schema(
     },
   },
   {
-    timeStamps: true,
+    timestamps: true,
   }
 );
 

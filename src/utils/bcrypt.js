@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 
-// hashPassword
+// hash Password
 export const hashPassword = (plainPass) =>
   bcrypt.hashSync(plainPass, +process.env.SALT);
 
