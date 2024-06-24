@@ -5,38 +5,45 @@ import { verifyRefreshJwt, verifyAccessJwt } from "../utils/jwt.js";
 // authenticate the user from access JWT
 export const auth = async (req, res, next) => {
   try {
-    // TODO
-    /**
-     * 1. verify access JWT
-     * 2. Check if token is present in session table
-     * 3. Get email and get User By Email
-     * 4. Update User(password) and return
-     */
-
     const { authorization } = req.headers;
+    let message = "";
 
     const decoded = verifyAccessJwt(authorization);
-    // if token verifies
-    if (decoded?.email) {
-      // get tokenObj from session table
-      const tokenObj = await findSession(authorization);
 
-      if (tokenObj?._id) {
-        // get user by email
-        const user = await getAUser(decoded.email);
+    if (decoded?.email) {
+      const session = await findSession({
+        token: authorization,
+        associate: decoded?.email,
+      });
+
+      console.log(session, "sesssssssssss");
+
+      if (session?._id) {
+        const user = await getAUser({ email: decoded.email });
+        console.log(user, "Checkkkkkkkk");
 
         if (user?._id) {
-          user.password = undefined;
-          req.userInfo = user;
-          return next();
+          if (user?.status === "inactive") {
+            message = "Your account is not active, Contact Admin";
+          }
+          if (!user?.isEmailVerified) {
+            message =
+              "Your account is not verified, Check your email and verify";
+          }
+
+          return message
+            ? next({
+                status: 403,
+                message,
+              })
+            : ((user.password = undefined), (req.userInfo = user), next());
         }
       }
     }
 
-    // if token not verified
     next({
       status: 403,
-      message: decoded,
+      message: decoded.message,
     });
   } catch (error) {
     next(error);
@@ -46,14 +53,6 @@ export const auth = async (req, res, next) => {
 // authenticate the user from refresh JWT
 export const jwtAuth = async (req, res, next) => {
   try {
-    // TODO
-    /**
-     * 1. verify refresh JWT
-     * 2.. Get email and get User By Email
-     * 3. Check if refreshJWT matches in user table
-     * 3. Update User(password) and return
-     */
-
     const { authorization } = req.headers;
 
     const decoded = verifyRefreshJwt(authorization);

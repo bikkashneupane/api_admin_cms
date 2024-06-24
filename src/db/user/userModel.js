@@ -7,7 +7,10 @@ export const insertUser = (obj) => userSchema(obj).save();
 export const getAllUsers = () => userSchema.find();
 
 // return user by filter
-export const getAUser = (filter) => userSchema.findOne(filter);
+export const getAUser = (filter) => {
+  console.log({ filter }, "herererere");
+  return userSchema.findOne(filter);
+};
 
 // update user
 export const updateUser = async (filter, obj) => {

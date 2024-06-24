@@ -2,7 +2,7 @@ import express from "express";
 import { getAUser, insertUser, updateUser } from "../db/user/userModel.js";
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { newUserValidator } from "../middleware/joi.js";
-import { signAccessJwt, signRefreshJwt } from "../utils/jwt.js";
+import { getTokens, signAccessJwt, signRefreshJwt } from "../utils/jwt.js";
 import { auth } from "../middleware/auth.js";
 import { v4 as uuidv4 } from "uuid";
 import { emailVerificationMail } from "../services/email/nodeMailer.js";
@@ -49,60 +49,14 @@ router.post("/register", newUserValidator, async (req, res, next) => {
       message: "Unable to create account, contact administration",
     });
   } catch (error) {
-    next(error);
-  }
-});
-
-// login  user
-router.post("/login", async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email.includes("@", ".") || !password) {
-      throw new Error("Invalid Data");
+    if (error.message.includes("E11000 duplicate key error collection:")) {
+      error.message = "Email already in use...";
     }
-
-    const user = await getAUser({ email });
-
-    if (user?._id) {
-      const isPassword = await comparePassword(password, user?.password);
-
-      return isPassword
-        ? res.json({
-            status: "success",
-            message: "Login Success..",
-            tokens: {
-              accessJWT: signAccessJwt({ email }),
-              refreshJWT: signRefreshJwt(user._id),
-            },
-          })
-        : res.json({
-            status: "error",
-            message: "Password Not Matched",
-          });
-    }
-    res.json({
-      status: "error",
-      message: "Invalid Login Credential",
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// get user profile
-router.get("/", auth, (req, res, next) => {
-  try {
-    res.json({
-      message: "chhh",
-    });
-  } catch (error) {
     next(error);
   }
 });
 
 // user verification
-// login  user
 router.post("/user-verification", async (req, res, next) => {
   try {
     const { c, e } = req.body;
@@ -131,6 +85,64 @@ router.post("/user-verification", async (req, res, next) => {
     res.json({
       status: "error",
       message: "Invalid Link, Contact Admin",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// login  user
+router.post("/login", async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email.includes("@", ".") || !password) {
+      throw new Error("Invalid Data");
+    }
+
+    const user = await getAUser({ email });
+
+    if (user?.status === "inactive") {
+      return res.json({
+        status: "error",
+        message: "Account not active, contact Admin",
+      });
+    }
+
+    if (user?._id) {
+      const isPassword = await comparePassword(password, user?.password);
+
+      return isPassword
+        ? res.json({
+            status: "success",
+            message: "Login Success..",
+            tokens: getTokens(user?.email),
+          })
+        : res.json({
+            status: "error",
+            message: "Password Not Matched",
+          });
+    }
+    res.json({
+      status: "error",
+      message: "Invalid Login Credential",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// get user profile
+router.get("/", auth, (req, res, next) => {
+  try {
+    req.userInfo.__v = undefined;
+    req.userInfo.refreshJWT = undefined;
+
+    console.log("here");
+    res.json({
+      status: "success",
+      message: "",
+      user: req.userInfo,
     });
   } catch (error) {
     next(error);

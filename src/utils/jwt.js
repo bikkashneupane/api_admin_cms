@@ -5,39 +5,46 @@ import { updateUser } from "../db/user/userModel.js";
 // sign access JWT
 export const signAccessJwt = ({ email }) => {
   const token = JWT.sign({ email }, process.env.ACCESS_SECRETE_KEY, {
-    expiresIn: "10m",
+    expiresIn: "30m",
   });
 
-  insertSession({ token });
+  insertSession({ token, associate: email });
   return token;
 };
 
 // verify access JWT
 export const verifyAccessJwt = (token) => {
   try {
-    return JWT.verify({ token }, process.env.ACCESS_SECRETE_KEY);
+    return JWT.verify(token, process.env.ACCESS_SECRETE_KEY);
   } catch (error) {
-    console.log(error);
-    return error.message;
+    // console.log(error);
+    return error;
   }
 };
 
 // sign refresh JWT
-export const signRefreshJwt = ({ _id }) => {
-  const refreshJWT = JWT.sign({ _id }, process.env.REFRESH_SECRETE_KEY, {
+export const signRefreshJwt = ({ email }) => {
+  const refreshJWT = JWT.sign({ email }, process.env.REFRESH_SECRETE_KEY, {
     expiresIn: "30d",
   });
 
-  updateUser({ _id }, { refreshJWT });
+  updateUser({ email }, { refreshJWT });
   return refreshJWT;
 };
 
 // verify refresh JWT
 export const verifyRefreshJwt = (token) => {
   try {
-    return JWT.verify({ token }, process.env.REFRESH_SECRETE_KEY);
+    return JWT.verify(token, process.env.REFRESH_SECRETE_KEY);
   } catch (error) {
     console.log(error);
     return error.message;
   }
+};
+
+export const getTokens = (email) => {
+  return {
+    accessJWT: signAccessJwt({ email }),
+    refreshJWT: signRefreshJwt({ email }),
+  };
 };
