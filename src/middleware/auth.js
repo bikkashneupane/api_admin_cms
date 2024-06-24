@@ -52,7 +52,7 @@ export const jwtAuth = async (req, res, next) => {
     const decoded = verifyRefreshJwt(authorization);
 
     if (decoded?.email) {
-      const user = await getAUser(decoded.email);
+      const user = await getAUser({ email: decoded.email });
 
       if (user?._id && user?.refreshJWT === authorization) {
         user.password = undefined;

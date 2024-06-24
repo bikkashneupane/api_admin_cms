@@ -3,7 +3,7 @@ import { getAUser, insertUser, updateUser } from "../db/user/userModel.js";
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { newUserValidator } from "../middleware/joi.js";
 import { getTokens, signAccessJwt, signRefreshJwt } from "../utils/jwt.js";
-import { auth } from "../middleware/auth.js";
+import { auth, jwtAuth } from "../middleware/auth.js";
 import { v4 as uuidv4 } from "uuid";
 import { emailVerificationMail } from "../services/email/nodeMailer.js";
 import { deleteSession, insertSession } from "../db/session/sessionModel.js";
@@ -142,11 +142,24 @@ router.get("/", auth, (req, res, next) => {
     req.userInfo.__v = undefined;
     req.userInfo.refreshJWT = undefined;
 
-    console.log("here");
     res.json({
       status: "success",
-      message: "",
+      message: "User Authenticated",
       user: req.userInfo,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// renew access
+router.get("/renew-access", jwtAuth, (req, res, next) => {
+  try {
+    const { email } = req.userInfo;
+    res.json({
+      status: "success",
+      message: "Access Renewed",
+      accessJWT: signAccessJwt({ email }),
     });
   } catch (error) {
     next(error);
