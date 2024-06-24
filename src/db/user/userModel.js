@@ -8,7 +8,6 @@ export const getAllUsers = () => userSchema.find();
 
 // return user by filter
 export const getAUser = (filter) => {
-  console.log({ filter }, "herererere");
   return userSchema.findOne(filter);
 };
 

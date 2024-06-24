@@ -100,16 +100,11 @@ router.post("/login", async (req, res, next) => {
       throw new Error("Invalid Data");
     }
 
+    let message = "";
+
     const user = await getAUser({ email });
 
-    if (user?.status === "inactive") {
-      return res.json({
-        status: "error",
-        message: "Account not active, contact Admin",
-      });
-    }
-
-    if (user?._id) {
+    if (user?._id && user?.status === "active" && user?.isEmailVerified) {
       const isPassword = await comparePassword(password, user?.password);
 
       return isPassword
@@ -123,9 +118,18 @@ router.post("/login", async (req, res, next) => {
             message: "Password Not Matched",
           });
     }
+
+    if (!user?.isEmailVerified) {
+      message = "Your account is not verified, Check your email and verify";
+    }
+
+    if (user?.status === "inactive") {
+      message = "Your account is not active, Contact Admin";
+    }
+
     res.json({
       status: "error",
-      message: "Invalid Login Credential",
+      message: message || "Invalid Login Credential",
     });
   } catch (error) {
     next(error);

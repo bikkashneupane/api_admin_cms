@@ -16,34 +16,28 @@ export const auth = async (req, res, next) => {
         associate: decoded?.email,
       });
 
-      console.log(session, "sesssssssssss");
-
       if (session?._id) {
         const user = await getAUser({ email: decoded.email });
-        console.log(user, "Checkkkkkkkk");
 
-        if (user?._id) {
-          if (user?.status === "inactive") {
-            message = "Your account is not active, Contact Admin";
-          }
-          if (!user?.isEmailVerified) {
-            message =
-              "Your account is not verified, Check your email and verify";
-          }
+        if (user?._id && user?.status === "active" && user?.isEmailVerified) {
+          user.password = undefined;
+          req.userInfo = user;
+          return next();
+        }
 
-          return message
-            ? next({
-                status: 403,
-                message,
-              })
-            : ((user.password = undefined), (req.userInfo = user), next());
+        if (user?.status === "inactive") {
+          message = "Your account is not active, Contact Admin";
+        }
+
+        if (!user?.isEmailVerified) {
+          message = "Your account is not verified, Check your email and verify";
         }
       }
     }
 
     next({
       status: 403,
-      message: decoded.message,
+      message: message || decoded.message,
     });
   } catch (error) {
     next(error);
