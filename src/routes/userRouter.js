@@ -6,7 +6,11 @@ import { getTokens, signAccessJwt, signRefreshJwt } from "../utils/jwt.js";
 import { auth, jwtAuth } from "../middleware/auth.js";
 import { v4 as uuidv4 } from "uuid";
 import { emailVerificationMail } from "../services/email/nodeMailer.js";
-import { deleteSession, insertSession } from "../db/session/sessionModel.js";
+import {
+  deleteManySession,
+  deleteSession,
+  insertSession,
+} from "../db/session/sessionModel.js";
 
 const router = express.Router();
 
@@ -160,6 +164,26 @@ router.get("/renew-access", jwtAuth, (req, res, next) => {
       status: "success",
       message: "Access Renewed",
       accessJWT: signAccessJwt({ email }),
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// logout user
+router.delete("/", jwtAuth, async (req, res, next) => {
+  try {
+    const { email } = req.userInfo;
+
+    // update user
+    await updateUser({ email }, { refreshJWT: "" });
+
+    //update session table
+    await deleteManySession({ associate: email });
+
+    res.json({
+      status: "success",
+      message: "User Logged Out",
     });
   } catch (error) {
     next(error);
