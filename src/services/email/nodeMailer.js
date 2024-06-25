@@ -41,6 +41,32 @@ export const emailVerificationMail = ({ email, firstName, url }) => {
   };
 
   emailProcessor(obj);
-  //   console.log("Message sent: %s", info.messageId);
-  // Message sent: <d786aa62-4e0a-070a-47ed-0b0666549519@ethereal.email>
+};
+
+// otp request notification
+export const sendOTPMail = ({ email, firstName, token }) => {
+  const obj = {
+    from: `"Tech Store 👻" <${process.env.SMTP_EMAIL}>`,
+    to: `${email}`,
+    subject: "Reset Password",
+    text: `Hello ${firstName}, Your OTP is : ${token} `,
+    html: `<b>Hello ${firstName}</b>
+            <p>Your One Time OTP is: ${token} </p>`,
+  };
+
+  emailProcessor(obj);
+};
+
+// password update notification
+export const accoundUpdateNotification = ({ email, firstName }) => {
+  const obj = {
+    from: `"Tech Store 👻" <${process.env.SMTP_EMAIL}>`,
+    to: `${email}`,
+    subject: "Reset Password",
+    text: `Hello ${firstName}, Your Password has been updated`,
+    html: `<b>Hello ${firstName}</b>
+            <p>Your Password has been updated </p>`,
+  };
+
+  emailProcessor(obj);
 };

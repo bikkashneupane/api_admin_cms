@@ -5,12 +5,17 @@ import { newUserValidator } from "../middleware/joi.js";
 import { getTokens, signAccessJwt, signRefreshJwt } from "../utils/jwt.js";
 import { auth, jwtAuth } from "../middleware/auth.js";
 import { v4 as uuidv4 } from "uuid";
-import { emailVerificationMail } from "../services/email/nodeMailer.js";
+import {
+  accoundUpdateNotification,
+  emailVerificationMail,
+  sendOTPMail,
+} from "../services/email/nodeMailer.js";
 import {
   deleteManySession,
   deleteSession,
   insertSession,
 } from "../db/session/sessionModel.js";
+import { otpGenerator } from "../utils/random.js";
 
 const router = express.Router();
 
@@ -184,6 +189,83 @@ router.delete("/", jwtAuth, async (req, res, next) => {
     res.json({
       status: "success",
       message: "User Logged Out",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// request OTP
+router.post("/otp", async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    const user = await getAUser({ email });
+
+    if (user?._id) {
+      const token = otpGenerator();
+      console.log(token);
+
+      const session = await insertSession({
+        token,
+        associate: email,
+        type: "otp",
+      });
+
+      if (session?._id) {
+        sendOTPMail({ email, token, firstName: user.firstName });
+      }
+    }
+
+    res.json({
+      status: "success",
+      message:
+        "If your email is found in the system, we will send you OTP to reset in your email",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// resetPassword
+router.post("/password/reset", async (req, res, next) => {
+  try {
+    const { otp, email, password } = req.body;
+
+    if ((otp, email, password)) {
+      const user = await getAUser({ email });
+
+      if (user?._id) {
+        // check for otp is valid in session table
+        const session = await deleteSession({
+          token: otp,
+          type: "otp",
+          associate: email,
+        });
+
+        if (session) {
+          password = hashPassword(password);
+
+          const updatedUser = await updateUser({ email }, { password });
+
+          if (updateUser?._id) {
+            accoundUpdateNotification({
+              email,
+              userName: updatedUser?.userName,
+            });
+
+            return res.json({
+              status: "success",
+              message: "Your password is updated",
+            });
+          }
+        }
+      }
+    }
+
+    res.json({
+      status: "error",
+      message: "Invalid data",
     });
   } catch (error) {
     next(error);
