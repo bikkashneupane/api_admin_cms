@@ -20,7 +20,7 @@ export const auth = async (req, res, next) => {
         const user = await getAUser({ email: decoded.email });
 
         if (user?._id && user?.status === "active" && user?.isEmailVerified) {
-          user.password = undefined;
+          // user.password = undefined;
           req.userInfo = user;
           return next();
         }
@@ -58,7 +58,7 @@ export const jwtAuth = async (req, res, next) => {
       });
 
       if (user?._id && user?.refreshJWT === authorization) {
-        user.password = undefined;
+        // user.password = undefined;
         req.userInfo = user;
         return next();
       }

@@ -148,8 +148,9 @@ router.post("/login", async (req, res, next) => {
 // get user profile
 router.get("/", auth, (req, res, next) => {
   try {
-    req.userInfo.__v = undefined;
+    req.userInfo.password = undefined;
     req.userInfo.refreshJWT = undefined;
+    req.userInfo.__v = undefined;
 
     res.json({
       status: "success",
@@ -266,6 +267,34 @@ router.post("/password/reset", async (req, res, next) => {
     res.json({
       status: "error",
       message: "Invalid data",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// change password
+router.post("/password/update", auth, async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const { email, password } = req.userInfo;
+
+    if (comparePassword(currentPassword, password)) {
+      const user = await updateUser({ email }, { password: newPassword });
+
+      user?._id
+        ? res.json({
+            status: "success",
+            message: "Passowrd Updated",
+          })
+        : res.json({
+            status: "error",
+            message: "Passowrd Update Failed, try again",
+          });
+    }
+    res.json({
+      status: "error",
+      message: "Passowrd Incorrect",
     });
   } catch (error) {
     next(error);
