@@ -19,8 +19,9 @@ export const updateCategory = (filter, obj) => {
 };
 
 // Delete A Category
-export const deleteCategory = (filter) =>
-  categorySchema.findOneAndDelete(filter);
+export const deleteCategory = (_id) => {
+  return categorySchema.findByIdAndDelete({ _id });
+};
 
 // Delete many Category
 export const deleteManyCategory = (filter) => {

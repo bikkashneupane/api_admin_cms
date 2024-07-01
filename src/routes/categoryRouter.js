@@ -16,8 +16,11 @@ router.post("/", async (req, res, next) => {
   try {
     const { title } = req.body;
 
-    if (typeof title && title.length) {
-      const slug = slugify(title, { lower: true });
+    if (typeof title === "string" && title.length) {
+      const slug = slugify(title, {
+        lower: true,
+        trim: true,
+      });
 
       const category = await insertCategory({ title, slug });
       return category?._id
@@ -33,12 +36,12 @@ router.post("/", async (req, res, next) => {
 
     res.json({
       status: "error",
-      message: "Title length or type incorrect",
+      message: "Invalid data",
     });
   } catch (error) {
     if (error.message.includes("E11000 duplicate key error collection:")) {
       error.message =
-        "Category slug already in use, please use new title for category";
+        "This category slug already exist, please change the name of the Category and try agian.";
       error.status = 200;
     }
     next(error);
@@ -49,7 +52,6 @@ router.post("/", async (req, res, next) => {
 router.get("/", async (req, res, next) => {
   try {
     const category = await getCategories();
-
     res.json({
       status: "success",
       message: "",
@@ -64,7 +66,7 @@ router.get("/", async (req, res, next) => {
 router.put("/", async (req, res, next) => {
   try {
     const { _id, ...rest } = req.body;
-    const category = await updateCategory({ _id }, { rest });
+    const category = await updateCategory({ _id }, { ...rest });
 
     category?._id
       ? res.json({
