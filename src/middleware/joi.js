@@ -39,3 +39,13 @@ export const newUserValidator = (req, res, next) => {
 
   return validator(schema, req, res, next);
 };
+
+// // new category validator
+// export const newCategoryValidator = (req, res, next) => {
+//   const schema = JOI.object({
+//     title: SHORT_STR_REQ,
+//     slug: SHORT_STR_REQ,
+//   });
+
+//   return validator(schema, req, res, next);
+// };

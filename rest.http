@@ -7,3 +7,11 @@ Content-Type: application/json
     "currentPassword":"11",
     "newPassword":"22"
 }
+
+### 
+POST http://localhost:8000/api/v1/categories/
+Content-Type: application/json
+
+{
+    "title":"Books"
+} 
