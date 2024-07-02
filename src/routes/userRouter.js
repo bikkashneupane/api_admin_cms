@@ -13,6 +13,7 @@ import {
 import {
   deleteManySession,
   deleteSession,
+  findSession,
   insertSession,
 } from "../db/session/sessionModel.js";
 import { otpGenerator } from "../utils/random.js";
@@ -232,32 +233,40 @@ router.post("/otp", async (req, res, next) => {
 router.post("/password/reset", async (req, res, next) => {
   try {
     const { otp, email, password } = req.body;
+    console.log(otp, email, password);
 
     if ((otp, email, password)) {
       const user = await getAUser({ email });
 
       if (user?._id) {
-        // check for otp is valid in session table
-        const session = await deleteSession({
+        const session = await findSession({
           token: otp,
           type: "otp",
           associate: email,
         });
 
         if (session) {
-          password = hashPassword(password);
+          const updatedUser = await updateUser(
+            { email },
+            { password: hashPassword(password) }
+          );
 
-          const updatedUser = await updateUser({ email }, { password });
-
-          if (updateUser?._id) {
+          if (updatedUser?._id) {
             accoundUpdateNotification({
               email,
-              userName: updatedUser?.userName,
+              firstName: updatedUser.firstName,
+            });
+
+            // delete session
+            await deleteSession({
+              token: otp,
+              type: "otp",
+              associate: email,
             });
 
             return res.json({
               status: "success",
-              message: "Your password is updated",
+              message: "Password Reset Success",
             });
           }
         }

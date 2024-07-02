@@ -12,8 +12,8 @@ export const getAUser = (filter) => {
 };
 
 // update user
-export const updateUser = async (filter, obj) => {
-  return await userSchema.findOneAndUpdate(filter, obj);
+export const updateUser = (filter, obj) => {
+  return userSchema.findOneAndUpdate(filter, obj);
 };
 
 // delete user

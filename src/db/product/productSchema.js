@@ -12,7 +12,7 @@ const schema = new mongoose.Schema(
     },
     sku: {
       type: String,
-      unique: true,
+      unique: [true, "Thi SKU has already in use, please enter new SKU."],
       required: true,
     },
     slug: {
@@ -29,8 +29,8 @@ const schema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    category: {
-      type: String,
+    parentCategoryId: {
+      type: mongoose.Types.ObjectId,
       required: true,
     },
     salesPrice: {

@@ -19,7 +19,7 @@ const emailProcessor = async (methodBodyObj) => {
       },
     });
 
-    // send mail with defined transport object
+    // 2. send mail
     const info = await transporter.sendMail(methodBodyObj);
     return info;
   } catch (error) {
@@ -62,7 +62,7 @@ export const accoundUpdateNotification = ({ email, firstName }) => {
   const obj = {
     from: `"Tech Store 👻" <${process.env.SMTP_EMAIL}>`,
     to: `${email}`,
-    subject: "Reset Password",
+    subject: "Account Updated",
     text: `Hello ${firstName}, Your Password has been updated`,
     html: `<b>Hello ${firstName}</b>
             <p>Your Password has been updated </p>`,

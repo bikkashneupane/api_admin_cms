@@ -61,7 +61,7 @@ export const newProductValidator = (req, res, next) => {
     sku: SHORT_STR_REQ,
     price: NUM,
     quantity: NUM,
-    category: SHORT_STR_REQ,
+    parentCategoryId: SHORT_STR_REQ,
     salesPrice: NUM_ALLOW,
     salesStart: DATE_REQ,
     salesEnd: DATE_REQ,
