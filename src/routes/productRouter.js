@@ -6,12 +6,14 @@ import {
   updateProduct,
 } from "../db/product/productModel.js";
 import slugify from "slugify";
+import { newProductValidator } from "../middleware/joi.js";
 
 const router = express.Router();
 
 // add new product
-router.post("/", async (req, res, next) => {
+router.post("/", newProductValidator, async (req, res, next) => {
   try {
+    console.log(req.body);
     const { title, sku, ...rest } = req.body;
     if (typeof title === "string" && title.length) {
       const slug = slugify(title, {
@@ -25,6 +27,9 @@ router.post("/", async (req, res, next) => {
         slug,
         ...rest,
       });
+
+      console.log(product);
+
       return product?._id
         ? res.json({
             status: "success",

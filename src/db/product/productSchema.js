@@ -49,10 +49,16 @@ const schema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    images: {
+    thumbnail: {
       type: String,
       required: true,
     },
+    images: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
   },
   {
     timestamps: true,
