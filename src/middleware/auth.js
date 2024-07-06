@@ -35,9 +35,11 @@ export const auth = async (req, res, next) => {
       }
     }
 
+    console.log("Message from auth: ", decoded);
+    // decoded.message
     next({
       status: 403,
-      message: message || decoded.message,
+      message: message || decoded,
     });
   } catch (error) {
     next(error);
@@ -62,10 +64,15 @@ export const jwtAuth = async (req, res, next) => {
         req.userInfo = user;
         return next();
       }
+      return next({
+        status: "error",
+        message: "Invalid Token",
+      });
     }
+
     next({
       status: 403,
-      message: decoded.message,
+      message: decoded,
     });
   } catch (error) {
     next(error);

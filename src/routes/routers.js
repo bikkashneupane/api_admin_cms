@@ -5,6 +5,6 @@ import userRouter from "./userRouter.js";
 
 export default [
   { path: "/api/v1/users", middlewares: [userRouter] },
-  { path: "/api/v1/categories", auth, middlewares: [categoryRouter] },
-  { path: "/api/v1/products", auth, middlewares: [productRouter] },
+  { path: "/api/v1/categories", middlewares: [auth, categoryRouter] },
+  { path: "/api/v1/products", middlewares: [auth, productRouter] },
 ];

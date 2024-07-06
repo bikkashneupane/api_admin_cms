@@ -12,7 +12,7 @@ export const getAUser = (filter) => {
 };
 
 // update user
-export const updateUser = (filter, obj) => {
+export const updateUser = async (filter, obj) => {
   return userSchema.findOneAndUpdate(filter, obj);
 };
 
