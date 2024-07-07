@@ -3,9 +3,9 @@ import { insertSession } from "../db/session/sessionModel.js";
 import { updateUser } from "../db/user/userModel.js";
 
 // sign access JWT
-export const signAccessJwt = ({ email }) => {
+export const signAccessJwt = (email) => {
   const token = JWT.sign({ email }, process.env.ACCESS_SECRETE_KEY, {
-    expiresIn: "1m",
+    expiresIn: "15m",
   });
 
   insertSession({ token, associate: email });
@@ -24,7 +24,7 @@ export const verifyAccessJwt = (token) => {
 };
 
 // sign refresh JWT
-export const signRefreshJwt = ({ email }) => {
+export const signRefreshJwt = (email) => {
   const refreshJWT = JWT.sign({ email }, process.env.REFRESH_SECRETE_KEY, {
     expiresIn: "30d",
   });
@@ -38,7 +38,6 @@ export const verifyRefreshJwt = (token) => {
   try {
     return JWT.verify(token, process.env.REFRESH_SECRETE_KEY);
   } catch (error) {
-    console.log("Error form jwt auth: ", error);
     return (error.message = error.message.includes("jwt expired")
       ? "jwt expired"
       : "Invalid Token");
@@ -47,7 +46,7 @@ export const verifyRefreshJwt = (token) => {
 
 export const getTokens = (email) => {
   return {
-    accessJWT: signAccessJwt({ email }),
-    refreshJWT: signRefreshJwt({ email }),
+    accessJWT: signAccessJwt(email),
+    refreshJWT: signRefreshJwt(email),
   };
 };

@@ -151,7 +151,6 @@ router.get("/", auth, (req, res, next) => {
   try {
     req.userInfo.password = undefined;
     req.userInfo.refreshJWT = undefined;
-    req.userInfo.__v = undefined;
 
     res.json({
       status: "success",
@@ -170,7 +169,7 @@ router.get("/renew-access", jwtAuth, (req, res, next) => {
     res.json({
       status: "success",
       message: "Access Renewed",
-      accessJWT: signAccessJwt({ email }),
+      accessJWT: signAccessJwt(email),
     });
   } catch (error) {
     next(error);

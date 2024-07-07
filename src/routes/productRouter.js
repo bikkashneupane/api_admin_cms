@@ -13,7 +13,6 @@ const router = express.Router();
 // add new product
 router.post("/", newProductValidator, async (req, res, next) => {
   try {
-    console.log(req.body);
     const { title, sku, ...rest } = req.body;
     if (typeof title === "string" && title.length) {
       const slug = slugify(title, {
@@ -27,8 +26,6 @@ router.post("/", newProductValidator, async (req, res, next) => {
         slug,
         ...rest,
       });
-
-      console.log(product);
 
       return product?._id
         ? res.json({
