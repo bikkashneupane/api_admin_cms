@@ -66,8 +66,6 @@ export const newProductValidator = (req, res, next) => {
     salesStart: DATE_REQ,
     salesEnd: DATE_REQ,
     description: SHORT_STR_REQ,
-    thumbnail: SHORT_STR_REQ,
-    images: ARR_REQ,
   });
 
   return validator(schema, req, res, next);

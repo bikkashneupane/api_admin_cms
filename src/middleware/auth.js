@@ -8,40 +8,37 @@ export const auth = async (req, res, next) => {
     const { authorization } = req.headers;
     let message = "";
 
-    if (authorization) {
-      const decoded = verifyAccessJwt(authorization);
+    const decoded = verifyAccessJwt(authorization);
 
-      if (decoded === "jwt expired") {
-        // TODO: Delete the token
-        // await deleteSession({token:authorization})
-      }
+    if (decoded === "jwt expired") {
+      // TODO: Delete the token
+      // await deleteSession({token:authorization})
+    }
 
-      if (decoded?.email) {
-        const session = await findSession({
-          token: authorization,
-          associate: decoded?.email,
-        });
+    if (decoded?.email) {
+      const session = await findSession({
+        token: authorization,
+        associate: decoded?.email,
+      });
 
-        if (session?._id) {
-          const user = await getAUser({ email: decoded.email });
+      if (session?._id) {
+        const user = await getAUser({ email: decoded.email });
 
-          if (user?._id && user?.isEmailVerified && user?.status === "active") {
-            user.__v = undefined;
-            req.userInfo = user;
-            return next();
-          }
-          if (!user?.isEmailVerified) {
-            message =
-              "Your account is not verified, Check your email and verify";
-          }
-          if (user?.status === "inactive") {
-            message = "Your account is not active, Contact Admin";
-          }
+        if (user?._id && user?.isEmailVerified && user?.status === "active") {
+          user.__v = undefined;
+          req.userInfo = user;
+          return next();
+        }
+        if (!user?.isEmailVerified) {
+          message = "Your account is not verified, Check your email and verify";
+        }
+        if (user?.status === "inactive") {
+          message = "Your account is not active, Contact Admin";
         }
       }
     }
 
-    console.log("Message from auth: ", decoded);
+    // console.log("Message from auth: ", decoded);
     // decoded.message
 
     // 403 => unauthorised,  401 => unauthenticated
@@ -60,22 +57,20 @@ export const jwtAuth = async (req, res, next) => {
     const { authorization } = req.headers;
     let message = "";
 
-    if (authorization) {
-      const decoded = verifyRefreshJwt(authorization);
+    const decoded = verifyRefreshJwt(authorization);
 
-      if (decoded?.email) {
-        const user = await getAUser({
-          email: decoded.email,
-          refreshJWT: authorization,
-        });
+    if (decoded?.email) {
+      const user = await getAUser({
+        email: decoded.email,
+        refreshJWT: authorization,
+      });
 
-        if (user?._id && user?.refreshJWT === authorization) {
-          user.__v = undefined;
-          req.userInfo = user;
-          return next();
-        }
-        message = "Invalid Token";
+      if (user?._id && user?.refreshJWT === authorization) {
+        user.__v = undefined;
+        req.userInfo = user;
+        return next();
       }
+      message = "Invalid Token";
     }
 
     next({

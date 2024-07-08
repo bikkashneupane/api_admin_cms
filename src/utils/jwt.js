@@ -5,7 +5,7 @@ import { updateUser } from "../db/user/userModel.js";
 // sign access JWT
 export const signAccessJwt = (email) => {
   const token = JWT.sign({ email }, process.env.ACCESS_SECRETE_KEY, {
-    expiresIn: "15m",
+    expiresIn: "10m",
   });
 
   insertSession({ token, associate: email });
