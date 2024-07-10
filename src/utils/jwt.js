@@ -17,9 +17,7 @@ export const verifyAccessJwt = (token) => {
   try {
     return JWT.verify(token, process.env.ACCESS_SECRETE_KEY);
   } catch (error) {
-    return (error.message = error.message.includes("jwt expired")
-      ? "jwt expired"
-      : "Invalid Token");
+    return error.message;
   }
 };
 
@@ -38,9 +36,7 @@ export const verifyRefreshJwt = (token) => {
   try {
     return JWT.verify(token, process.env.REFRESH_SECRETE_KEY);
   } catch (error) {
-    return (error.message = error.message.includes("jwt expired")
-      ? "jwt expired"
-      : "Invalid Token");
+    return error.message;
   }
 };
 

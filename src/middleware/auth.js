@@ -10,11 +10,6 @@ export const auth = async (req, res, next) => {
 
     const decoded = verifyAccessJwt(authorization);
 
-    if (decoded === "jwt expired") {
-      // TODO: Delete the token
-      // await deleteSession({token:authorization})
-    }
-
     if (decoded?.email) {
       const session = await findSession({
         token: authorization,

@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
 });
 
 const limits = {
-  fileSize: 1 * 1024 * 1024, // limit fileseize to 10 MB
+  fileSize: 10 * 1024 * 1024, // limit fileseize to 10 MB
 };
 
 // const fileFilter =

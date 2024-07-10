@@ -19,6 +19,7 @@ router.post(
   async (req, res, next) => {
     try {
       const { title, sku, ...rest } = req.body;
+
       if (typeof title === "string" && title.length) {
         const slug = slugify(title, {
           lower: true,
@@ -31,6 +32,7 @@ router.post(
           const newImgs = req.files.map((item) => {
             return item.path.replace("public", "");
           });
+
           rest.images = newImgs;
           rest.thumbnail = newImgs[0];
         }
@@ -80,7 +82,20 @@ router.get("/", async (req, res, next) => {
 // edit product
 router.put("/", multerUpload.array("images", 5), async (req, res, next) => {
   try {
-    const { _id, ...rest } = req.body;
+    const { _id, existingImages, ...rest } = req.body;
+
+    if (req.files?.length > 0) {
+      const newImgs = req.files.map((item) => {
+        return item.path.replace("public", "");
+      });
+
+      rest.images = [...existingImages, ...newImgs];
+
+      rest.thumbnail = rest.images[0];
+
+      console.log(rest, "After Adding new images to old images");
+    }
+
     const product = await updateProduct({ _id }, { ...rest });
 
     product?._id
