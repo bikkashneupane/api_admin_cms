@@ -80,20 +80,19 @@ router.get("/", async (req, res, next) => {
 });
 
 // edit product
-router.put("/", multerUpload.array("images", 5), async (req, res, next) => {
+router.put("/", multerUpload.array("new-images", 5), async (req, res, next) => {
   try {
-    const { _id, existingImages, ...rest } = req.body;
+    const { _id, images, ...rest } = req.body;
+    rest.images = [...images];
+    rest.thumbnail = rest.images[0];
 
     if (req.files?.length > 0) {
       const newImgs = req.files.map((item) => {
         return item.path.replace("public", "");
       });
 
-      rest.images = [...existingImages, ...newImgs];
-
+      rest.images = [...rest.images, ...newImgs];
       rest.thumbnail = rest.images[0];
-
-      console.log(rest, "After Adding new images to old images");
     }
 
     const product = await updateProduct({ _id }, { ...rest });
