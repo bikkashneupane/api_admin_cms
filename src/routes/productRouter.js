@@ -7,7 +7,12 @@ import {
 } from "../db/product/productModel.js";
 import slugify from "slugify";
 import { newProductValidator } from "../middleware/joi.js";
-import multerUpload from "../utils/uploadMulter.js";
+import multerUpload from "../utils/image-upload/multer.js";
+import {
+  cloudinaryUpload,
+  validateImageCount,
+  deleteCloudinaryImage,
+} from "../utils/image-upload/cloudinary.js";
 
 const router = express.Router();
 
@@ -15,11 +20,11 @@ const router = express.Router();
 router.post(
   "/",
   multerUpload.array("images", 5),
+  validateImageCount,
   newProductValidator,
   async (req, res, next) => {
     try {
       const { title, sku, ...rest } = req.body;
-
       if (typeof title === "string" && title.length) {
         const slug = slugify(title, {
           lower: true,
@@ -28,15 +33,24 @@ router.post(
 
         // generate thumbnail path
         // generate images paths
+        // with multer and public/img/product path
+        // if (req.files?.length > 0) {
+        //   const newImgs = req.files.map((item) => {
+        //     return item.path.replace("public", "");
+        //   });
+        //   rest.images = newImgs;
+        //   rest.thumbnail = newImgs[0];
+        // }
+
+        // generate thumbnail and images path with cloudinary path
         if (req.files?.length > 0) {
-          const newImgs = req.files.map((item) => {
-            return item.path.replace("public", "");
-          });
+          const imgURLs = await Promise.all(
+            req.files.map((file) => cloudinaryUpload(file.path))
+          );
 
-          rest.images = newImgs;
-          rest.thumbnail = newImgs[0];
+          rest.images = imgURLs;
+          rest.thumbnail = imgURLs[0];
         }
-
         const product = await insertProduct({
           ...rest,
           title,
@@ -44,16 +58,17 @@ router.post(
           slug,
         });
 
-        return product?._id
-          ? res.json({
-              status: "success",
-              message: "New Product Added",
-            })
-          : res.json({
-              status: "error",
-              message: "Unable to add new Product, try again",
-            });
+        if (product?._id) {
+          return res.json({
+            status: "success",
+            message: "New Product Added",
+          });
+        }
       }
+      res.json({
+        status: "error",
+        message: "Unable to add new Product, try again",
+      });
     } catch (error) {
       if (error.message.includes("E11000 duplicate key error collection:")) {
         error.message =
@@ -80,36 +95,51 @@ router.get("/", async (req, res, next) => {
 });
 
 // edit product
-router.put("/", multerUpload.array("new-images", 5), async (req, res, next) => {
-  try {
-    const { _id, images, ...rest } = req.body;
-    rest.images = [...images];
-    rest.thumbnail = rest.images[0];
+router.put(
+  "/",
+  multerUpload.array("new-images", 5),
+  validateImageCount,
+  async (req, res, next) => {
+    try {
+      const { _id, images, ...rest } = req.body;
+      rest.images = images ? [...images] : null;
+      rest.thumbnail = rest.images ? rest.images[0] : null;
 
-    if (req.files?.length > 0) {
-      const newImgs = req.files.map((item) => {
-        return item.path.replace("public", "");
-      });
+      // upload images to cloudinary
+      if (req.files?.length > 0) {
+        const newImgURLs = await Promise.all(
+          req.files.map((file) => cloudinaryUpload(file.path))
+        );
 
-      rest.images = [...rest.images, ...newImgs];
-      rest.thumbnail = rest.images[0];
-    }
+        rest.images = rest.images
+          ? [...rest.images, ...newImgURLs]
+          : [...newImgURLs];
+        rest.thumbnail = rest.images[0];
+      }
 
-    const product = await updateProduct({ _id }, { ...rest });
-
-    product?._id
-      ? res.json({
+      // update product and delete removed images from cloudinary
+      const product = await updateProduct({ _id }, { ...rest });
+      if (product?._id) {
+        if (rest.images.length) {
+          const imagesToDelete = product.images.filter(
+            (item) => !rest.images.includes(item)
+          );
+          await deleteCloudinaryImage(imagesToDelete);
+        }
+        return res.json({
           status: "success",
           message: "Edit Success",
-        })
-      : res.json({
-          status: "error",
-          message: "Unable to update, try again",
         });
-  } catch (error) {
-    next(error);
+      }
+      res.json({
+        status: "error",
+        message: "Unable to update, try again",
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 // delete product
 router.delete("/:_id?", async (req, res, next) => {

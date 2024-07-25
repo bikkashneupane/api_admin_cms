@@ -19,7 +19,7 @@ const ARR_REQ = JOI.array().items(JOI.string()).min(1).required();
 const validator = (schema, req, res, next) => {
   try {
     const { error } = schema.validate(req.body);
-    console.log(error);
+    error && console.log("JOI validator error: ", error);
     error
       ? res.json({
           status: "error",
