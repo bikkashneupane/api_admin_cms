@@ -24,13 +24,19 @@ router.post(
   newProductValidator,
   async (req, res, next) => {
     try {
-      const { title, sku, ...rest } = req.body;
+      const { title, sku, salesPrice, salesStart, salesEnd, ...rest } =
+        req.body;
+
+      const isSales = salesPrice ? true : false;
+      rest.sales = { isSales, salesPrice, salesStart, salesEnd };
+
       if (typeof title === "string" && title.length) {
         const slug = slugify(title, {
           lower: true,
           trim: true,
         });
 
+        console.log(rest);
         // generate thumbnail path
         // generate images paths
         // with multer and public/img/product path
@@ -101,7 +107,11 @@ router.put(
   validateImageCount,
   async (req, res, next) => {
     try {
-      const { _id, images, ...rest } = req.body;
+      const { _id, images, salesPrice, salesStart, salesEnd, ...rest } =
+        req.body;
+      const isSales = salesPrice ? true : false;
+
+      rest.sales = { isSales, salesPrice, salesStart, salesEnd };
       rest.images = images ? [...images] : null;
       rest.thumbnail = rest.images ? rest.images[0] : null;
 
@@ -147,15 +157,19 @@ router.delete("/:_id?", async (req, res, next) => {
     const { _id } = req.params;
     const product = await deleteProduct(_id);
 
-    product?._id
-      ? res.json({
-          status: "success",
-          message: "Delete Success",
-        })
-      : res.json({
-          status: "error",
-          message: "Unable to delete, try again",
-        });
+    if (product?._id) {
+      // delete the images from cloudinary
+      await deleteCloudinaryImage(products.images);
+      return res.json({
+        status: "success",
+        message: "Delete Success",
+      });
+    }
+
+    res.json({
+      status: "error",
+      message: "Unable to delete, try again",
+    });
   } catch (error) {
     next(error);
   }

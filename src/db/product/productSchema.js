@@ -33,18 +33,25 @@ const schema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       required: true,
     },
-    salesPrice: {
-      type: Number,
-      default: null,
+    sales: {
+      isSales: {
+        type: Boolean,
+        default: false,
+      },
+      salesPrice: {
+        type: Number,
+        default: null,
+      },
+      salesStart: {
+        type: Date,
+        default: null,
+      },
+      salesEnd: {
+        type: Date,
+        default: null,
+      },
     },
-    salesStart: {
-      type: Date,
-      default: null,
-    },
-    salesEnd: {
-      type: Date,
-      default: null,
-    },
+
     description: {
       type: String,
       required: true,
