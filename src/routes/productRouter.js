@@ -24,14 +24,13 @@ router.post(
   newProductValidator,
   async (req, res, next) => {
     try {
-      const { title, sku, salesPrice, salesStart, salesEnd, ...rest } =
-        req.body;
+      const { name, sku, salesPrice, salesStart, salesEnd, ...rest } = req.body;
 
       const isSales = salesPrice ? true : false;
       rest.sales = { isSales, salesPrice, salesStart, salesEnd };
 
-      if (typeof title === "string" && title.length) {
-        const slug = slugify(title, {
+      if (typeof name === "string" && name.length) {
+        const slug = slugify(name, {
           lower: true,
           trim: true,
         });
@@ -59,7 +58,7 @@ router.post(
         }
         const product = await insertProduct({
           ...rest,
-          title,
+          name,
           sku: sku?.toUpperCase(),
           slug,
         });

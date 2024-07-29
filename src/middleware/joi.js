@@ -61,11 +61,12 @@ export const newProductValidator = (req, res, next) => {
     sku: SHORT_STR_REQ,
     price: NUM,
     quantity: NUM,
-    parentCategoryId: SHORT_STR_REQ,
+    categoryId: SHORT_STR_REQ,
     salesPrice: NUM_ALLOW,
     salesStart: DATE_REQ,
     salesEnd: DATE_REQ,
     description: SHORT_STR_REQ,
+    gender: SHORT_STR.valid("men", "women", "unisex").default("unisex"),
   });
 
   return validator(schema, req, res, next);

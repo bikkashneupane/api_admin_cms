@@ -6,7 +6,12 @@ const schema = new mongoose.Schema(
       type: String,
       default: "inactive",
     },
-    title: {
+    categoryId: {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "Category",
+    },
+    name: {
       type: String,
       required: true,
     },
@@ -27,10 +32,6 @@ const schema = new mongoose.Schema(
     },
     quantity: {
       type: Number,
-      required: true,
-    },
-    parentCategoryId: {
-      type: mongoose.Types.ObjectId,
       required: true,
     },
     sales: {
@@ -66,6 +67,11 @@ const schema = new mongoose.Schema(
         required: true,
       },
     ],
+    gender: {
+      type: String,
+      default: "unisex",
+      enum: ["men", "women", "unisex"],
+    },
   },
   {
     timestamps: true,
