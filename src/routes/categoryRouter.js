@@ -8,6 +8,10 @@ import {
 } from "../db/category/categoryModel.js";
 // import { newCategoryValidator } from "../middleware/joi.js";
 import slugify from "slugify";
+import {
+  getSubCategories,
+  insertSubCategory,
+} from "../db/sub-category/subCategoryModel.js";
 
 const router = express.Router();
 
@@ -16,7 +20,7 @@ router.post("/", async (req, res, next) => {
   try {
     const { title } = req.body;
 
-    if (typeof title === "string" && title.length) {
+    if (typeof title === "string" && title.length > 0) {
       const slug = slugify(title, {
         lower: true,
         trim: true,
@@ -102,4 +106,66 @@ router.delete("/:_id?", async (req, res, next) => {
   }
 });
 
+// add new sub - category
+router.post("/sub-category", async (req, res, next) => {
+  try {
+    const { parentCategoryId, brand, material, gender } = req.body;
+    const brandWithSlug = brand?.map((item) => {
+      if (typeof item === "string" && item.length > 0) {
+        const slug = slugify(item, { lower: true, trim: true });
+        return { name: item, slug };
+      }
+      throw new Error("Invalid Data");
+    });
+
+    const materialWithSlug = material?.map((item) => {
+      if (typeof item === "string" && item.length > 0) {
+        const slug = slugify(item, { lower: true, trim: true });
+        return { name: item, slug };
+      }
+      throw new Error("Invalid Data");
+    });
+
+    console.log(brandWithSlug, materialWithSlug);
+
+    const subCat = await insertSubCategory({
+      parentCategoryId,
+      brand: brandWithSlug,
+      material: materialWithSlug,
+      gender,
+    });
+
+    return subCat?._id
+      ? res.json({
+          status: "success",
+          message: "New Sub Category Added",
+        })
+      : res.json({
+          status: "error",
+          message: "Unable to add new Sub Category, try again",
+        });
+  } catch (error) {
+    if (error.message.includes("E11000 duplicate key error collection:")) {
+      error.message =
+        "This category slug already exist, please change the name of the Category and try agian.";
+      error.status = 200;
+    }
+    next(error);
+  }
+});
+
+// get sub categories
+// get category
+router.get("/sub-category", async (req, res, next) => {
+  try {
+    const subCategory = await getSubCategories();
+    res.json({
+      status: "success",
+      message: "",
+      subCategory,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 export default router;

@@ -35,7 +35,6 @@ router.post(
           trim: true,
         });
 
-        console.log(rest);
         // generate thumbnail path
         // generate images paths
         // with multer and public/img/product path

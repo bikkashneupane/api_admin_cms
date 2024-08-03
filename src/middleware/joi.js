@@ -57,7 +57,7 @@ export const newUserValidator = (req, res, next) => {
 // new product validator
 export const newProductValidator = (req, res, next) => {
   const schema = JOI.object({
-    title: SHORT_STR_REQ,
+    name: SHORT_STR_REQ,
     sku: SHORT_STR_REQ,
     price: NUM,
     quantity: NUM,
