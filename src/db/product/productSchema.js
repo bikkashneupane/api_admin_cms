@@ -6,11 +6,6 @@ const schema = new mongoose.Schema(
       type: String,
       default: "inactive",
     },
-    categoryId: {
-      type: mongoose.Types.ObjectId,
-      required: true,
-      ref: "Category",
-    },
     name: {
       type: String,
       required: true,
@@ -18,12 +13,13 @@ const schema = new mongoose.Schema(
     sku: {
       type: String,
       unique: [true, "Thi SKU has already in use, please enter new SKU."],
+      index: true,
       required: true,
     },
     slug: {
       type: String,
       unique: true,
-      index: 1,
+      index: true,
       required: true,
     },
     price: {
@@ -33,6 +29,40 @@ const schema = new mongoose.Schema(
     quantity: {
       type: Number,
       required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    thumbnail: {
+      type: String,
+      default: "",
+    },
+    images: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+    categoryId: {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "Category",
+    },
+    brandId: {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "SubCategory",
+    },
+    materialId: {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "SubCategory",
+    },
+    gender: {
+      type: String,
+      default: "unisex",
+      enum: ["men", "women", "unisex"],
     },
     sales: {
       isSales: {
@@ -51,26 +81,6 @@ const schema = new mongoose.Schema(
         type: Date,
         default: null,
       },
-    },
-
-    description: {
-      type: String,
-      required: true,
-    },
-    thumbnail: {
-      type: String,
-      default: "",
-    },
-    images: [
-      {
-        type: String,
-        required: true,
-      },
-    ],
-    gender: {
-      type: String,
-      default: "unisex",
-      enum: ["men", "women", "unisex"],
     },
   },
   {
