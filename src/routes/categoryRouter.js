@@ -18,7 +18,7 @@ const router = express.Router();
 // add new category
 router.post("/", async (req, res, next) => {
   try {
-    const { title } = req.body;
+    const { title, ...rest } = req.body;
 
     if (typeof title === "string" && title.length > 0) {
       const slug = slugify(title, {
@@ -26,7 +26,7 @@ router.post("/", async (req, res, next) => {
         trim: true,
       });
 
-      const category = await insertCategory({ title, slug });
+      const category = await insertCategory({ title, slug, ...rest });
       return category?._id
         ? res.json({
             status: "success",
@@ -154,18 +154,4 @@ router.post("/sub-category", async (req, res, next) => {
   }
 });
 
-// get sub categories
-// get category
-router.get("/sub-category", async (req, res, next) => {
-  try {
-    const subCategory = await getSubCategories();
-    res.json({
-      status: "success",
-      message: "",
-      subCategory,
-    });
-  } catch (error) {
-    next(error);
-  }
-});
 export default router;
