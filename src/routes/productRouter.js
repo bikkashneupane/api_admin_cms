@@ -24,18 +24,7 @@ router.post(
   newProductValidator,
   async (req, res, next) => {
     try {
-      const {
-        name,
-        sku,
-        salesPrice,
-        salesStart,
-        salesEnd,
-        product_gender,
-        ...rest
-      } = req.body;
-      const isSales = salesPrice ? true : false;
-      rest.sales = { isSales, salesPrice, salesStart, salesEnd };
-      rest.gender = product_gender;
+      const { name, sku, ...rest } = req.body;
 
       if (typeof name === "string" && name.length) {
         const slug = slugify(name, {
@@ -43,7 +32,6 @@ router.post(
           trim: true,
         });
 
-        console.log(sku, slug);
         // generate thumbnail path
         // generate images paths
         // with multer and public/img/product path

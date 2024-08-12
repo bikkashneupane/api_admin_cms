@@ -64,23 +64,17 @@ const schema = new mongoose.Schema(
       default: "unisex",
       enum: ["men", "women", "unisex"],
     },
-    sales: {
-      isSales: {
-        type: Boolean,
-        default: false,
-      },
-      salesPrice: {
-        type: Number,
-        default: null,
-      },
-      salesStart: {
-        type: Date,
-        default: null,
-      },
-      salesEnd: {
-        type: Date,
-        default: null,
-      },
+    salesPrice: {
+      type: Number,
+      default: null,
+    },
+    salesStart: {
+      type: Date,
+      default: null,
+    },
+    salesEnd: {
+      type: Date,
+      default: null,
     },
   },
   {
