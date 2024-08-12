@@ -1,13 +1,17 @@
 import express from "express";
 import {
+  deleteBrand,
   getBrands,
   getOneBrand,
   insertBrand,
+  updateBrandById,
 } from "../db/sub-category/brandModel.js";
 import {
+  deleteMaterial,
   getMaterials,
   getOneMaterial,
   insertMaterial,
+  updateMaterialById,
 } from "../db/sub-category/materialModel.js";
 import slugify from "slugify";
 
@@ -114,4 +118,81 @@ subCatRouter.get("/", async (req, res, next) => {
   }
 });
 
+// edit brand
+subCatRouter.put("/edit-brand", async (req, res, next) => {
+  try {
+    const { _id, name } = req.body;
+    const brand = await updateBrandById(_id, { name });
+    brand?._id
+      ? res.json({
+          status: "success",
+          message: "Brand Edited",
+        })
+      : res.json({
+          status: "eoor",
+          message: "Couldn't edit brand, try again",
+        });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// edit material
+subCatRouter.put("/edit-material", async (req, res, next) => {
+  try {
+    const { _id, name } = req.body;
+    const material = await updateMaterialById(_id, { name });
+    material?._id
+      ? res.json({
+          status: "success",
+          message: "Material Edited",
+        })
+      : res.json({
+          status: "error",
+          message: "Couldn't edit material, try again",
+        });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// delete brand
+subCatRouter.delete("/delete-brand/:_id?", async (req, res, next) => {
+  try {
+    const { _id } = req.params;
+    const brand = await deleteBrand(_id);
+
+    category?._id
+      ? res.json({
+          status: "success",
+          message: "Delete Success",
+        })
+      : res.json({
+          status: "error",
+          message: "Unable to delete, try again",
+        });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// delete material
+subCatRouter.delete("/delete-material/:_id?", async (req, res, next) => {
+  try {
+    const { _id } = req.params;
+    const material = await deleteMaterial(_id);
+
+    material?._id
+      ? res.json({
+          status: "success",
+          message: "Delete Success",
+        })
+      : res.json({
+          status: "error",
+          message: "Unable to delete, try again",
+        });
+  } catch (error) {
+    next(error);
+  }
+});
 export default subCatRouter;

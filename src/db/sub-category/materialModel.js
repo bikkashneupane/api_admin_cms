@@ -34,8 +34,8 @@ export const getMaterials = (filter) => {
 };
 
 // Update Material
-export const updateMaterial = (filter, obj) => {
-  return materialSchema.findOneAndUpdate(filter, obj, { new: true });
+export const updateMaterialById = (_id, obj) => {
+  return materialSchema.findByIdAndUpdate(_id, obj);
 };
 
 // Delete A Material

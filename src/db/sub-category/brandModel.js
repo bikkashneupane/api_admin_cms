@@ -34,8 +34,8 @@ export const getBrands = (filter) => {
 };
 
 // Update Brand
-export const updateBrand = (filter, obj) => {
-  return brandSchema.findOneAndUpdate(filter, obj, { new: true });
+export const updateBrandById = (_id, obj) => {
+  return brandSchema.findByIdAndUpdate(_id, obj);
 };
 
 // Delete A Brand
