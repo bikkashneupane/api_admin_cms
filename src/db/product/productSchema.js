@@ -52,12 +52,12 @@ const schema = new mongoose.Schema(
     brandId: {
       type: mongoose.Types.ObjectId,
       required: true,
-      ref: "SubCategory",
+      ref: "Brands",
     },
     materialId: {
       type: mongoose.Types.ObjectId,
       required: true,
-      ref: "SubCategory",
+      ref: "Materials",
     },
     gender: {
       type: String,

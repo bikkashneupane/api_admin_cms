@@ -194,4 +194,5 @@ subCatRouter.delete("/delete-material/:_id?", async (req, res, next) => {
     next(error);
   }
 });
+
 export default subCatRouter;
