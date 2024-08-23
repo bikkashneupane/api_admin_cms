@@ -1,5 +1,10 @@
 import express from "express";
-import { getAUser, insertUser, updateUser } from "../db/user/userModel.js";
+import {
+  getAllUsers,
+  getAUser,
+  insertUser,
+  updateUser,
+} from "../db/user/userModel.js";
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { newUserValidator } from "../middleware/joi.js";
 import { getTokens, signAccessJwt, signRefreshJwt } from "../utils/jwt.js";
@@ -303,6 +308,29 @@ router.post("/password/update", auth, async (req, res, next) => {
     res.json({
       status: "error",
       message: "Passowrd Incorrect",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// get all users
+router.get("/all", auth, async (req, res, next) => {
+  try {
+    const users = await getAllUsers();
+
+    const allUsers = users?.map((user) => {
+      // Convert user to plain object to strip away internal properties
+      const userObj = user.toObject ? user.toObject() : { ...user };
+
+      const { password, refreshJWT, ...rest } = userObj;
+      return rest;
+    });
+
+    res.json({
+      status: "success",
+      message: "User Authenticated",
+      allUsers,
     });
   } catch (error) {
     next(error);

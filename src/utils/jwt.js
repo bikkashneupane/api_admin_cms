@@ -5,7 +5,7 @@ import { updateUser } from "../db/user/userModel.js";
 // sign access JWT
 export const signAccessJwt = (email) => {
   const token = JWT.sign({ email }, process.env.ACCESS_SECRETE_KEY, {
-    expiresIn: "10m",
+    expiresIn: "1m",
   });
 
   insertSession({ token, associate: email });
@@ -17,6 +17,10 @@ export const verifyAccessJwt = (token) => {
   try {
     return JWT.verify(token, process.env.ACCESS_SECRETE_KEY);
   } catch (error) {
+    console.log("Erro Verifying Access: ", error);
+    error.message = error.message.includes("jwt expired")
+      ? "jwt expired"
+      : "Invalid Token";
     return error.message;
   }
 };
@@ -36,6 +40,10 @@ export const verifyRefreshJwt = (token) => {
   try {
     return JWT.verify(token, process.env.REFRESH_SECRETE_KEY);
   } catch (error) {
+    console.log("JWT Verigy error Refresh: ", error);
+    error.message = error.message.includes("jwt expired")
+      ? "jwt expired"
+      : "Invalid Token";
     return error.message;
   }
 };

@@ -161,8 +161,7 @@ subCatRouter.delete("/delete-brand/:_id?", async (req, res, next) => {
   try {
     const { _id } = req.params;
     const brand = await deleteBrand(_id);
-
-    category?._id
+    brand?._id
       ? res.json({
           status: "success",
           message: "Delete Success",

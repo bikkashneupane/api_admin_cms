@@ -40,7 +40,7 @@ export const updateBrandById = (_id, obj) => {
 
 // Delete A Brand
 export const deleteBrand = (_id) => {
-  return brandSchema.findByIdAndDelete({ _id });
+  return brandSchema.findByIdAndDelete(_id);
 };
 
 // Delete many Brand

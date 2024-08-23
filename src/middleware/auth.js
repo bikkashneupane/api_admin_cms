@@ -6,8 +6,14 @@ import { verifyRefreshJwt, verifyAccessJwt } from "../utils/jwt.js";
 export const auth = async (req, res, next) => {
   try {
     const { authorization } = req.headers;
-    let message = "";
+    if (!authorization) {
+      return next({
+        status: 401,
+        message: "Authorization header is missing",
+      });
+    }
 
+    let message = "";
     const decoded = verifyAccessJwt(authorization);
 
     if (decoded?.email) {
@@ -33,9 +39,6 @@ export const auth = async (req, res, next) => {
       }
     }
 
-    // console.log("Message from auth: ", decoded);
-    // decoded.message
-
     // 403 => unauthorised,  401 => unauthenticated
     next({
       status: message ? 403 : 401,
@@ -50,8 +53,14 @@ export const auth = async (req, res, next) => {
 export const jwtAuth = async (req, res, next) => {
   try {
     const { authorization } = req.headers;
-    let message = "";
+    if (!authorization) {
+      return next({
+        status: 401,
+        message: "Authorization header is missing",
+      });
+    }
 
+    let message = "";
     const decoded = verifyRefreshJwt(authorization);
 
     if (decoded?.email) {
