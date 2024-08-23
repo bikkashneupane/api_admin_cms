@@ -337,4 +337,23 @@ router.get("/all", auth, async (req, res, next) => {
   }
 });
 
+// edit user role
+router.put("/edit-role", async (req, res, next) => {
+  try {
+    const { _id, role } = req.body;
+    const user = await updateUser({ _id }, { role });
+
+    user?._id
+      ? res.json({
+          status: "success",
+          message: "Role updated",
+        })
+      : res.json({
+          status: "error",
+          message: "Unable to update role, try again",
+        });
+  } catch (error) {
+    next(error);
+  }
+});
 export default router;

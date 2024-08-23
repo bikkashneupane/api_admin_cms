@@ -1,5 +1,9 @@
 import express from "express";
-import { getReviews, insertReview } from "../db/review/reviewModel.js";
+import {
+  getReviews,
+  insertReview,
+  updateReview,
+} from "../db/review/reviewModel.js";
 import { newReviewValidator } from "../middleware/joi.js";
 import { getOrderByFilter } from "../db/order/orderModel.js";
 
@@ -57,6 +61,27 @@ router.get("/", async (req, res, next) => {
       : res.json({
           status: "error",
           message: "No reviews available currently.",
+        });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// edit review
+router.put("/", async (req, res, next) => {
+  try {
+    const { _id, status } = req.body;
+
+    const updatedReview = await updateReview({ _id }, { status });
+
+    updatedReview?._id
+      ? res.json({
+          status: "success",
+          message: "Review Updated",
+        })
+      : res.json({
+          status: "error",
+          message: "Couldn't update review, try again",
         });
   } catch (error) {
     next(error);

@@ -16,10 +16,6 @@ export const getReviews = (filter) => {
 };
 
 // update review
-// upsert doesnlt let mongo to create new document if already exist
 export const updateReview = (filter, obj) => {
-  return reviewSchema.findOneAndUpdate(filter, obj, {
-    new: true,
-    upsert: false,
-  });
+  return reviewSchema.findOneAndUpdate(filter, obj);
 };

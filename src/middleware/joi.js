@@ -63,11 +63,11 @@ export const newProductValidator = (req, res, next) => {
 // new review validatior
 export const newReviewValidator = (req, res, next) => {
   const schema = JOI.object({
-    title: STR_REQ,
-    message: STR_REQ,
-    ratings: NUM_REQ,
-    productId: STR_REQ,
-    orderId: STR_REQ,
+    title: SHORT_STR_REQ,
+    message: SHORT_STR_REQ,
+    ratings: NUM,
+    productId: SHORT_STR_REQ,
+    orderId: SHORT_STR_REQ,
   });
 
   return joiValidator(schema, req, res, next);
