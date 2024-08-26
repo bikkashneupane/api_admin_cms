@@ -15,7 +15,6 @@ const DATE = JOI.date();
 const validator = (schema, req, res, next) => {
   try {
     const { error } = schema.validate(req.body);
-    error && console.log("JOI validator error: ", error);
     error
       ? res.json({
           status: "error",

@@ -22,7 +22,7 @@ router.post("/", auth, newReviewValidator, async (req, res, next) => {
       profileImage,
       status: "Succeeded",
     });
-    console.log("Product Purchased", productPurchased);
+
     if (productPurchased?._id) {
       const review = await insertReview({
         ...rest,

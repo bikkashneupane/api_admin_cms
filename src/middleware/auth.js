@@ -14,7 +14,6 @@ export const auth = async (req, res, next) => {
     }
 
     const decoded = verifyAccessJwt(authorization);
-    console.log("Decoded from auth: ", decoded);
 
     // Check if the token verification failed and returned an error message
     if (typeof decoded === "string") {
@@ -30,7 +29,6 @@ export const auth = async (req, res, next) => {
         associate: decoded?.email,
       });
 
-      console.log("session obj: ", session);
       if (session?._id) {
         const user = await getAUser({ email: decoded.email });
 

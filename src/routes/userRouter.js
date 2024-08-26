@@ -216,7 +216,6 @@ router.post("/otp", async (req, res, next) => {
 
     if (user?._id) {
       const token = otpGenerator();
-      console.log(token);
 
       const session = await insertSession({
         token,
@@ -243,7 +242,6 @@ router.post("/otp", async (req, res, next) => {
 router.post("/password/reset", async (req, res, next) => {
   try {
     const { otp, email, password } = req.body;
-    console.log(otp, email, password);
 
     if ((otp, email, password)) {
       const user = await getAUser({ email });
