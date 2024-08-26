@@ -14,6 +14,7 @@ import {
   updateMaterialById,
 } from "../db/sub-category/materialModel.js";
 import slugify from "slugify";
+import { auth } from "../middleware/auth.js";
 
 const subCatRouter = express.Router();
 
@@ -49,7 +50,7 @@ const checkAndInsertItems = async (items, getOneItem, insertItem, itemType) => {
 };
 
 // Insert brand/material
-subCatRouter.post("/", async (req, res, next) => {
+subCatRouter.post("/", auth, async (req, res, next) => {
   try {
     const { brand, material } = req.body;
 
@@ -119,7 +120,7 @@ subCatRouter.get("/", async (req, res, next) => {
 });
 
 // edit brand
-subCatRouter.put("/edit-brand", async (req, res, next) => {
+subCatRouter.put("/edit-brand", auth, async (req, res, next) => {
   try {
     const { _id, name } = req.body;
     const brand = await updateBrandById(_id, { name });
@@ -138,7 +139,7 @@ subCatRouter.put("/edit-brand", async (req, res, next) => {
 });
 
 // edit material
-subCatRouter.put("/edit-material", async (req, res, next) => {
+subCatRouter.put("/edit-material", auth, async (req, res, next) => {
   try {
     const { _id, name } = req.body;
     const material = await updateMaterialById(_id, { name });
@@ -157,7 +158,7 @@ subCatRouter.put("/edit-material", async (req, res, next) => {
 });
 
 // delete brand
-subCatRouter.delete("/delete-brand/:_id?", async (req, res, next) => {
+subCatRouter.delete("/delete-brand/:_id?", auth, async (req, res, next) => {
   try {
     const { _id } = req.params;
     const brand = await deleteBrand(_id);
@@ -176,7 +177,7 @@ subCatRouter.delete("/delete-brand/:_id?", async (req, res, next) => {
 });
 
 // delete material
-subCatRouter.delete("/delete-material/:_id?", async (req, res, next) => {
+subCatRouter.delete("/delete-material/:_id?", auth, async (req, res, next) => {
   try {
     const { _id } = req.params;
     const material = await deleteMaterial(_id);

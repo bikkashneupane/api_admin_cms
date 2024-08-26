@@ -1,5 +1,5 @@
-import { deleteSession, findSession } from "../db/session/sessionModel.js";
-import { getAUser, updateUser } from "../db/user/userModel.js";
+import { findSession } from "../db/session/sessionModel.js";
+import { getAUser } from "../db/user/userModel.js";
 import { verifyRefreshJwt, verifyAccessJwt } from "../utils/jwt.js";
 
 // authenticate the user from access JWT
@@ -13,8 +13,16 @@ export const auth = async (req, res, next) => {
       });
     }
 
-    let message = "";
     const decoded = verifyAccessJwt(authorization);
+    console.log("Decoded from auth: ", decoded);
+
+    // Check if the token verification failed and returned an error message
+    if (typeof decoded === "string") {
+      return next({
+        status: 401,
+        message: decoded, // "jwt expired" or "Invalid Token"
+      });
+    }
 
     if (decoded?.email) {
       const session = await findSession({
@@ -22,27 +30,38 @@ export const auth = async (req, res, next) => {
         associate: decoded?.email,
       });
 
+      console.log("session obj: ", session);
       if (session?._id) {
         const user = await getAUser({ email: decoded.email });
 
-        if (user?._id && user?.isEmailVerified && user?.status === "active") {
+        if (user?._id) {
+          if (!user?.isEmailVerified) {
+            return next({
+              status: 403,
+              message:
+                "Your account is not verified. Check your email and verify.",
+            });
+          }
+
+          if (user?.status === "inactive") {
+            return next({
+              status: 403,
+              message: "Your account is not active. Contact Admin.",
+            });
+          }
+
+          // Attach user info in request and proceed
           user.__v = undefined;
           req.userInfo = user;
           return next();
-        }
-        if (!user?.isEmailVerified) {
-          message = "Your account is not verified, Check your email and verify";
-        }
-        if (user?.status === "inactive") {
-          message = "Your account is not active, Contact Admin";
         }
       }
     }
 
     // 403 => unauthorised,  401 => unauthenticated
     next({
-      status: message ? 403 : 401,
-      message: message || decoded,
+      status: 403,
+      message: "Unauthorized access.",
     });
   } catch (error) {
     next(error);
@@ -60,9 +79,15 @@ export const jwtAuth = async (req, res, next) => {
       });
     }
 
-    let message = "";
     const decoded = verifyRefreshJwt(authorization);
 
+    // Check if the token verification failed and returned an error message
+    if (typeof decoded === "string") {
+      return next({
+        status: 401,
+        message: decoded, // "jwt expired" or "Invalid Token"
+      });
+    }
     if (decoded?.email) {
       const user = await getAUser({
         email: decoded.email,
@@ -74,12 +99,11 @@ export const jwtAuth = async (req, res, next) => {
         req.userInfo = user;
         return next();
       }
-      message = "Invalid Token";
     }
 
-    next({
-      status: message ? 403 : 401,
-      message: decoded,
+    return next({
+      status: 403,
+      message: "Invalid Token or unauthorized access.",
     });
   } catch (error) {
     next(error);

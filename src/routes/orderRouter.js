@@ -1,10 +1,11 @@
 import express from "express";
 import { getOrders, updateOrder } from "../db/order/orderModel.js";
+import { auth } from "../middleware/auth.js";
 
 const router = express.Router();
 
 // find all my orders
-router.get("/", async (req, res, next) => {
+router.get("/", auth, async (req, res, next) => {
   try {
     const { role } = req.userInfo;
     if (role === "admin") {

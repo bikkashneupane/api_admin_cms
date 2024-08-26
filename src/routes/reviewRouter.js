@@ -6,11 +6,12 @@ import {
 } from "../db/review/reviewModel.js";
 import { newReviewValidator } from "../middleware/joi.js";
 import { getOrderByFilter } from "../db/order/orderModel.js";
+import { auth } from "../middleware/auth.js";
 
 const router = express.Router();
 
 //post review
-router.post("/", newReviewValidator, async (req, res, next) => {
+router.post("/", auth, newReviewValidator, async (req, res, next) => {
   try {
     const { _id, firstName, lastName, profileImage } = req.userInfo;
     const { orderId, ...rest } = req.body;
@@ -68,7 +69,7 @@ router.get("/", async (req, res, next) => {
 });
 
 // edit review
-router.put("/", async (req, res, next) => {
+router.put("/", auth, async (req, res, next) => {
   try {
     const { _id, status } = req.body;
 
@@ -87,4 +88,5 @@ router.put("/", async (req, res, next) => {
     next(error);
   }
 });
+
 export default router;

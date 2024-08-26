@@ -4,7 +4,7 @@ import { updateUser } from "../db/user/userModel.js";
 
 // sign access JWT
 export const signAccessJwt = (email) => {
-  const token = JWT.sign({ email }, process.env.ACCESS_SECRETE_KEY, {
+  const token = JWT.sign({ email }, process.env.ACCESS_SECRET_KEY, {
     expiresIn: "1m",
   });
 
@@ -15,18 +15,20 @@ export const signAccessJwt = (email) => {
 // verify access JWT
 export const verifyAccessJwt = (token) => {
   try {
-    return JWT.verify(token, process.env.ACCESS_SECRETE_KEY);
+    return JWT.verify(token, process.env.ACCESS_SECRET_KEY);
   } catch (error) {
-    error.message = error.message.includes("jwt expired")
-      ? "jwt expired"
-      : "Invalid Token";
-    return error.message;
+    console.log("Sign Access Error: ", error.message);
+
+    if (error.message.includes("jwt expired")) {
+      return "jwt expired";
+    }
+    return "Invalid Token";
   }
 };
 
 // sign refresh JWT
 export const signRefreshJwt = (email) => {
-  const refreshJWT = JWT.sign({ email }, process.env.REFRESH_SECRETE_KEY, {
+  const refreshJWT = JWT.sign({ email }, process.env.REFRESH_SECRET_KEY, {
     expiresIn: "30d",
   });
 
@@ -37,12 +39,14 @@ export const signRefreshJwt = (email) => {
 // verify refresh JWT
 export const verifyRefreshJwt = (token) => {
   try {
-    return JWT.verify(token, process.env.REFRESH_SECRETE_KEY);
+    return JWT.verify(token, process.env.REFRESH_SECRET_KEY);
   } catch (error) {
-    error.message = error.message.includes("jwt expired")
-      ? "jwt expired"
-      : "Invalid Token";
-    return error.message;
+    console.log("Sign Refresh Error: ", error.message);
+
+    if (error.message.includes("jwt expired")) {
+      return "jwt expired";
+    }
+    return "Invalid Token";
   }
 };
 

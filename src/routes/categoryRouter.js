@@ -7,11 +7,12 @@ import {
 } from "../db/category/categoryModel.js";
 // import { newCategoryValidator } from "../middleware/joi.js";
 import slugify from "slugify";
+import { auth } from "../middleware/auth.js";
 
 const router = express.Router();
 
 // add new category
-router.post("/", async (req, res, next) => {
+router.post("/", auth, async (req, res, next) => {
   try {
     const { title, ...rest } = req.body;
 
@@ -62,7 +63,7 @@ router.get("/", async (req, res, next) => {
 });
 
 // edit category
-router.put("/", async (req, res, next) => {
+router.put("/", auth, async (req, res, next) => {
   try {
     const { _id, ...rest } = req.body;
     const category = await updateCategory({ _id }, { ...rest });
@@ -82,7 +83,7 @@ router.put("/", async (req, res, next) => {
 });
 
 // delete category
-router.delete("/:_id?", async (req, res, next) => {
+router.delete("/:_id?", auth, async (req, res, next) => {
   try {
     const { _id } = req.params;
     const category = await deleteCategory(_id);

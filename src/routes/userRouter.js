@@ -11,8 +11,9 @@ import { getTokens, signAccessJwt, signRefreshJwt } from "../utils/jwt.js";
 import { auth, jwtAuth } from "../middleware/auth.js";
 import { v4 as uuidv4 } from "uuid";
 import {
-  accoundUpdateNotification,
+  accountUpdateNotification,
   emailVerificationMail,
+  emailVerifiedNotification,
   sendOTPMail,
 } from "../services/email/nodeMailer.js";
 import {
@@ -47,8 +48,7 @@ router.post("/register", newUserValidator, async (req, res, next) => {
         emailVerificationMail({
           email: user.email,
           firstName: user.firstName,
-          url:
-            process.env.FE_ROOT_URL + `/verify-user?c=${token}&e=${user.email}`,
+          uniqueKey: token,
         });
 
         return res.json({
@@ -90,6 +90,12 @@ router.post("/user-verification", async (req, res, next) => {
       );
 
       if (user?._id) {
+        // account verification notification mail
+        await emailVerifiedNotification({
+          email,
+          firstName: user?.firstName,
+        });
+
         return res.json({
           status: "success",
           message: "Your Account has been verified. You may login now!",
@@ -256,7 +262,8 @@ router.post("/password/reset", async (req, res, next) => {
           );
 
           if (updatedUser?._id) {
-            accoundUpdateNotification({
+            // password updated mail
+            accountUpdateNotification({
               email,
               firstName: updatedUser.firstName,
             });
@@ -295,15 +302,22 @@ router.post("/password/update", auth, async (req, res, next) => {
     if (comparePassword(currentPassword, password)) {
       const user = await updateUser({ email }, { password: newPassword });
 
-      user?._id
-        ? res.json({
-            status: "success",
-            message: "Passowrd Updated",
-          })
-        : res.json({
-            status: "error",
-            message: "Passowrd Update Failed, try again",
-          });
+      if (user?._id) {
+        // password updated mail
+        accountUpdateNotification({
+          email,
+          firstName: user?.firstName,
+        });
+
+        return res.json({
+          status: "success",
+          message: "Passowrd Updated",
+        });
+      }
+      return res.json({
+        status: "error",
+        message: "Passowrd Update Failed, try again",
+      });
     }
     res.json({
       status: "error",
@@ -315,7 +329,7 @@ router.post("/password/update", auth, async (req, res, next) => {
 });
 
 // get all users
-router.get("/all", auth, async (req, res, next) => {
+router.get("/all", async (req, res, next) => {
   try {
     const users = await getAllUsers();
 
@@ -338,7 +352,7 @@ router.get("/all", auth, async (req, res, next) => {
 });
 
 // edit user role
-router.put("/edit-role", async (req, res, next) => {
+router.put("/edit-role", auth, async (req, res, next) => {
   try {
     const { _id, role } = req.body;
     const user = await updateUser({ _id }, { role });
@@ -356,4 +370,5 @@ router.put("/edit-role", async (req, res, next) => {
     next(error);
   }
 });
+
 export default router;

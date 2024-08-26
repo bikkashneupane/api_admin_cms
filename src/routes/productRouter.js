@@ -13,12 +13,14 @@ import {
   validateImageCount,
   deleteCloudinaryImage,
 } from "../utils/image-upload/cloudinary.js";
+import { auth } from "../middleware/auth.js";
 
 const router = express.Router();
 
 // add new product
 router.post(
   "/",
+  auth,
   multerUpload.array("images", 5),
   validateImageCount,
   newProductValidator,
@@ -98,6 +100,7 @@ router.get("/", async (req, res, next) => {
 // edit product
 router.put(
   "/",
+  auth,
   multerUpload.array("new-images", 5),
   validateImageCount,
   async (req, res, next) => {
@@ -147,7 +150,7 @@ router.put(
 );
 
 // delete product
-router.delete("/:_id?", async (req, res, next) => {
+router.delete("/:_id?", auth, async (req, res, next) => {
   try {
     const { _id } = req.params;
     const product = await deleteProduct(_id);
