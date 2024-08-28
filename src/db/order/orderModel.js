@@ -15,11 +15,12 @@ export const getOrders = (filter) => {
   return orderSchema.find(filter);
 };
 
+// find all Order
+export const deleteOrder = (_id) => {
+  return orderSchema.findByIdAndDelete(_id);
+};
+
 // update order
-// upsert doesnlt let mongo to create new document if already exist
 export const updateOrder = (filter, obj) => {
-  return orderSchema.findOneAndUpdate(filter, obj, {
-    new: true,
-    upsert: false,
-  });
+  return orderSchema.findOneAndUpdate(filter, obj);
 };

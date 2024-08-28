@@ -8,7 +8,7 @@ import {
 import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { newUserValidator } from "../middleware/joi.js";
 import { getTokens, signAccessJwt, signRefreshJwt } from "../utils/jwt.js";
-import { auth, jwtAuth } from "../middleware/auth.js";
+import { auth, isAdmin, jwtAuth } from "../middleware/auth.js";
 import { v4 as uuidv4 } from "uuid";
 import {
   accountUpdateNotification,
@@ -350,7 +350,7 @@ router.get("/all", async (req, res, next) => {
 });
 
 // edit user role
-router.put("/edit-role", auth, async (req, res, next) => {
+router.put("/edit-role", auth, isAdmin, async (req, res, next) => {
   try {
     const { _id, role } = req.body;
     const user = await updateUser({ _id }, { role });

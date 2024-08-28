@@ -6,6 +6,7 @@ import { verifyRefreshJwt, verifyAccessJwt } from "../utils/jwt.js";
 export const auth = async (req, res, next) => {
   try {
     const { authorization } = req.headers;
+
     if (!authorization) {
       return next({
         status: 401,
@@ -106,4 +107,10 @@ export const jwtAuth = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+export const isAdmin = (req, res, next) => {
+  req.userInfo.role === "admin"
+    ? next()
+    : res.status(403).json({ status: "error", message: "Unauthorized User" });
 };

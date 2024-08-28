@@ -2,9 +2,14 @@ import { mongoose } from "mongoose";
 
 const schema = new mongoose.Schema(
   {
-    status: {
+    paymentStatus: {
       type: String,
-      default: "processing",
+      default: "pending",
+    },
+    orderStatus: {
+      type: String,
+      default: "pending",
+      enum: ["pending", "confirmed", "processing", "shipped", "delivered"],
     },
     orderId: {
       type: String,
