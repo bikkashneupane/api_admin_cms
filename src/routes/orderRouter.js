@@ -36,11 +36,14 @@ router.delete("/:_id?", auth, isAdmin, async (req, res, next) => {
 // edit Order
 router.put("/", auth, isAdmin, async (req, res, next) => {
   try {
-    const { _id, deliveryStatus } = req.body;
+    const { _id, orderStatus } = req.body;
 
-    const order = await updateOrder({ _id }, { deliveryStatus });
+    const order = await updateOrder({ _id }, { orderStatus });
     order?._id
-      ? res.json({ status: "success", message: "Delivery Status Updated" })
+      ? res.json({
+          status: "success",
+          message: "Order Delivery Status Updated",
+        })
       : res.json({
           status: "error",
           message: "Couldn't edit Order, try again",
