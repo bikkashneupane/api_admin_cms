@@ -41,8 +41,11 @@ app.use((req, res, next) => {
 // global error handler
 app.use((error, req, res, next) => {
   console.log(error);
+  const message = error.message.includes("user is not allowed to do action")
+    ? "Only Read Access Granted. Contact Admin for full Access"
+    : error.message;
   res.status(error.status || 500).json({
-    message: error.message,
+    message,
   });
 });
 
