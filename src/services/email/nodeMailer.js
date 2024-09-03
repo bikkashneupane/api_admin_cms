@@ -10,12 +10,10 @@ const emailProcessor = async (methodBodyObj) => {
   try {
     // 1. create transport
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: 587,
-      secure: false, // Use `true` for port 465, `false` for all other ports
+      service: `${process.env.SMTP_HOST}`,
       auth: {
-        user: process.env.SMTP_EMAIL,
-        pass: process.env.SMTP_PASSWORD,
+        user: `${process.env.SMTP_EMAIL}`,
+        pass: `${process.env.SMTP_PASSWORD}`,
       },
     });
 
@@ -35,18 +33,18 @@ export const emailVerificationMail = ({ email, firstName, uniqueKey }) => {
     from: `"${process.env.SMTP_SENDER}" <${process.env.SMTP_EMAIL}>`,
     to: email, // list of receivers
     subject: "Verify Your Account",
-    text: `Hello ${firstName},\n\nThank you for signing up! Please follow the link to verify your account:\n\n${url}\n\nIf you did not sign up for an account, please ignore this email.\n\nBest regards,\nThe Team`,
+    text: `Hello Admin ${firstName},\n\nPlease follow the link to verify your account:\n\n${url}\n\nIf you are not the intended person, please ignore this email.\n\nBest regards,\nThe Team`,
     html: `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f4f4f4; padding: 20px;">
         <div style="max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px;">
-          <h2 style="text-align: center; color: #4CAF50;">Welcome to Our Service, ${firstName}!</h2>
-          <p>Thank you for creating an account with us. To complete your registration, please click the button below to verify your email address:</p>
+          <h2 style="text-align: center; color: #4CAF50;">Welcome to Vikiasmy's, ${firstName}!</h2>
+          <p>To complete your registration, please click the button below to verify your email address:</p>
           <div style="text-align: center; margin: 20px;">
             <a href="${url}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Verify Now</a>
           </div>
           <p>If the button above doesn't work, please copy and paste the following link into your web browser:</p>
           <p style="word-wrap: break-word;"><a href="${url}" style="color: #4CAF50;">${url}</a></p>
-          <p>If you did not sign up for an account, please ignore this email.</p>
+          <p>If you were not expecting this email, please ignore this email.</p>
           <p>Best regards,<br/>Vikiasmy's</p>
         </div>
       </div>`,
@@ -59,7 +57,7 @@ export const emailVerificationMail = ({ email, firstName, uniqueKey }) => {
 export const emailVerifiedNotification = ({ email, firstName }) => {
   const mailBody = {
     from: `"${process.env.SMTP_SENDER}" <${process.env.SMTP_EMAIL}>`,
-    to: email, // list of receivers
+    to: email,
     subject: "Your Account is Now Verified! Log In to Start Shopping",
     text: `Hello ${firstName},\n\nCongratulations! Your account has been successfully verified. You can now log in to purchase your favorite watches and accessories.\n\nBest regards,\nThe Team`,
     html: `
@@ -71,8 +69,6 @@ export const emailVerifiedNotification = ({ email, firstName }) => {
           <div style="text-align: center; margin: 20px;">
             <a href="${process.env.FRONTEND_ROOT}/login" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Log In Now</a>
           </div>
-          <p>If you have any questions or need assistance, please do not hesitate to contact our support team.</p>
-          <p>Happy Shopping!</p>
           <p>Best regards,<br/>Vikiasmy's</p>
         </div>
       </div>`,

@@ -17,43 +17,40 @@ export const auth = async (req, res, next) => {
     const decoded = verifyAccessJwt(authorization);
 
     // Check if the token verification failed and returned an error message
-    if (typeof decoded === "string") {
+    if (typeof decoded === "string" || !decoded?.email) {
       return next({
         status: 401,
         message: decoded, // "jwt expired" or "Invalid Token"
       });
     }
 
-    if (decoded?.email) {
-      const session = await findSession({
-        token: authorization,
-        associate: decoded?.email,
-      });
+    const session = await findSession({
+      token: authorization,
+      associate: decoded?.email,
+    });
 
-      if (session?._id) {
-        const user = await getAUser({ email: decoded.email });
+    if (session?._id) {
+      const user = await getAUser({ email: decoded.email });
 
-        if (user?._id) {
-          if (!user?.isEmailVerified) {
-            return next({
-              status: 403,
-              message:
-                "Your account is not verified. Check your email and verify.",
-            });
-          }
-
-          if (user?.status === "inactive") {
-            return next({
-              status: 403,
-              message: "Your account is not active. Contact Admin.",
-            });
-          }
-
-          // Attach user info in request and proceed
-          user.__v = undefined;
-          req.userInfo = user;
-          return next();
+      if (user?._id) {
+        if (!user?.isEmailVerified) {
+          return next({
+            status: 403,
+            message: "Account Not Verified. Check email to Verify Now",
+          });
         }
+
+        if (user?.status === "inactive") {
+          return next({
+            status: 403,
+            message: "Account Not Active. Contact Admin.",
+          });
+        }
+
+        // Attach user info in request and proceed
+        user.__v = undefined;
+        req.userInfo = user;
+        return next();
       }
     }
 

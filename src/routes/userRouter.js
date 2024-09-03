@@ -27,7 +27,7 @@ import { otpGenerator } from "../utils/random.js";
 const router = express.Router();
 
 // register new user
-router.post("/register", newUserValidator, async (req, res, next) => {
+router.post("/register", auth, newUserValidator, async (req, res, next) => {
   try {
     req.body.password = hashPassword(req.body.password);
 
@@ -54,14 +54,14 @@ router.post("/register", newUserValidator, async (req, res, next) => {
         return res.json({
           status: "success",
           message:
-            "Account Created, Please check your email to verify  account!!",
+            "Account Created, Once the user verifies account you can change their role",
         });
       }
     }
 
     res.json({
       status: "error",
-      message: "Unable to create account, contact administration",
+      message: "Unable to create account,try again",
     });
   } catch (error) {
     if (error.message.includes("E11000 duplicate key error collection:")) {
@@ -74,18 +74,17 @@ router.post("/register", newUserValidator, async (req, res, next) => {
 // user verification
 router.post("/user-verification", async (req, res, next) => {
   try {
-    const { c, e } = req.body;
-
+    const { uniqueKey, email } = req.body;
     // delete session token
     const session = await deleteSession({
-      token: c,
-      associate: e,
+      token: uniqueKey,
+      associate: email,
     });
 
     if (session?._id) {
       // update admin table => make status active
       const user = await updateUser(
-        { email: e },
+        { email },
         { status: "active", isEmailVerified: true }
       );
 
@@ -291,8 +290,28 @@ router.post("/password/reset", async (req, res, next) => {
   }
 });
 
+// update profile detail
+router.put("/profile/update", auth, async (req, res, next) => {
+  try {
+    const { email } = req.userInfo;
+
+    const updatedUser = await updateUser({ email }, { ...req.body });
+    return updatedUser?._id
+      ? res.json({
+          status: "success",
+          message: "User profile updated",
+        })
+      : res.json({
+          status: "error",
+          message: "Couldn't update profile, try again",
+        });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // change password
-router.post("/password/update", auth, async (req, res, next) => {
+router.put("/password/update", auth, async (req, res, next) => {
   try {
     const { currentPassword, newPassword } = req.body;
     const { email, password } = req.userInfo;
@@ -309,7 +328,7 @@ router.post("/password/update", auth, async (req, res, next) => {
 
         return res.json({
           status: "success",
-          message: "Passowrd Updated",
+          message: "Password Updated",
         });
       }
       return res.json({

@@ -26,7 +26,7 @@ router.delete("/:_id?", auth, isAdmin, async (req, res, next) => {
       ? res.json({ status: "success", message: "Order Deleted" })
       : res.json({
           status: "error",
-          message: "Couldn't delete Order, try again",
+          message: "Couldn't delete order, try again",
         });
   } catch (error) {
     next(error);
@@ -42,11 +42,11 @@ router.put("/", auth, isAdmin, async (req, res, next) => {
     order?._id
       ? res.json({
           status: "success",
-          message: "Order Delivery Status Updated",
+          message: "Order Status Updated",
         })
       : res.json({
           status: "error",
-          message: "Couldn't edit Order, try again",
+          message: "Couldn't edit order, try again",
         });
   } catch (error) {
     next(error);
