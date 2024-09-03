@@ -5,6 +5,5 @@ export const otpGenerator = (length = 6) => {
     str += Math.floor(Math.random() * 10);
   }
 
-  console.log(str);
   return str;
 };
