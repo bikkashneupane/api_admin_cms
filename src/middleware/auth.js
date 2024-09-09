@@ -56,7 +56,7 @@ export const auth = async (req, res, next) => {
 
     // 403 => unauthorised,  401 => unauthenticated
     next({
-      status: 403,
+      status: 401,
       message: "Unauthorized access.",
     });
   } catch (error) {
@@ -84,6 +84,7 @@ export const jwtAuth = async (req, res, next) => {
         message: decoded, // "jwt expired" or "Invalid Token"
       });
     }
+
     if (decoded?.email) {
       const user = await getAUser({
         email: decoded.email,
@@ -99,7 +100,7 @@ export const jwtAuth = async (req, res, next) => {
 
     return next({
       status: 403,
-      message: "Invalid Token or unauthorized access.",
+      message: "Invalid Token or unauthorized access",
     });
   } catch (error) {
     next(error);

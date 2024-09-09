@@ -127,16 +127,19 @@ router.post("/login", async (req, res, next) => {
     if (user?._id && user?.status === "active" && user?.isEmailVerified) {
       const isPassword = await comparePassword(password, user?.password);
 
-      return isPassword
-        ? res.json({
-            status: "success",
-            message: "Login Success..",
-            tokens: getTokens(user?.email),
-          })
-        : res.json({
-            status: "error",
-            message: "Password Not Matched",
-          });
+      if (isPassword) {
+        const tokens = await getTokens(user?.email);
+        return res.json({
+          status: "success",
+          message: "Login Success..",
+          tokens,
+        });
+      } else {
+        return res.json({
+          status: "error",
+          message: "Password Not Matched",
+        });
+      }
     }
 
     if (!user?.isEmailVerified) {
@@ -172,14 +175,39 @@ router.get("/", auth, (req, res, next) => {
   }
 });
 
+// get all users
+router.get("/all", async (req, res, next) => {
+  try {
+    const users = await getAllUsers();
+
+    const allUsers = users?.map((user) => {
+      // Convert user to plain object to strip away internal properties
+      const userObj = user.toObject ? user.toObject() : { ...user };
+
+      const { password, refreshJWT, ...rest } = userObj;
+      return rest;
+    });
+
+    res.json({
+      status: "success",
+      message: "User Authenticated",
+      allUsers,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // renew access
-router.get("/renew-access", jwtAuth, (req, res, next) => {
+router.get("/renew-access", jwtAuth, async (req, res, next) => {
   try {
     const { email } = req.userInfo;
+    const accessJWT = await signAccessJwt(email);
+
     res.json({
       status: "success",
       message: "Access Renewed",
-      accessJWT: signAccessJwt(email),
+      accessJWT,
     });
   } catch (error) {
     next(error);
@@ -339,29 +367,6 @@ router.put("/password/update", auth, async (req, res, next) => {
     res.json({
       status: "error",
       message: "Passowrd Incorrect",
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// get all users
-router.get("/all", async (req, res, next) => {
-  try {
-    const users = await getAllUsers();
-
-    const allUsers = users?.map((user) => {
-      // Convert user to plain object to strip away internal properties
-      const userObj = user.toObject ? user.toObject() : { ...user };
-
-      const { password, refreshJWT, ...rest } = userObj;
-      return rest;
-    });
-
-    res.json({
-      status: "success",
-      message: "User Authenticated",
-      allUsers,
     });
   } catch (error) {
     next(error);

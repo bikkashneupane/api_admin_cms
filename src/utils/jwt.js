@@ -3,13 +3,17 @@ import { insertSession } from "../db/session/sessionModel.js";
 import { updateUser } from "../db/user/userModel.js";
 
 // sign access JWT
-export const signAccessJwt = (email) => {
-  const token = JWT.sign({ email }, process.env.ACCESS_SECRET_KEY, {
-    expiresIn: "30m",
-  });
+export const signAccessJwt = async (email) => {
+  try {
+    const token = JWT.sign({ email }, process.env.ACCESS_SECRET_KEY, {
+      expiresIn: "30m",
+    });
+    await insertSession({ token, associate: email });
 
-  insertSession({ token, associate: email });
-  return token;
+    return token;
+  } catch (error) {
+    console.error("Error inserting session:", error);
+  }
 };
 
 // verify access JWT
@@ -25,13 +29,17 @@ export const verifyAccessJwt = (token) => {
 };
 
 // sign refresh JWT
-export const signRefreshJwt = (email) => {
-  const refreshJWT = JWT.sign({ email }, process.env.REFRESH_SECRET_KEY, {
-    expiresIn: "30d",
-  });
+export const signRefreshJwt = async (email) => {
+  try {
+    const refreshJWT = JWT.sign({ email }, process.env.REFRESH_SECRET_KEY, {
+      expiresIn: "30d",
+    });
 
-  updateUser({ email }, { refreshJWT });
-  return refreshJWT;
+    await updateUser({ email }, { refreshJWT });
+    return refreshJWT;
+  } catch (error) {
+    console.error("Error updating user:", error);
+  }
 };
 
 // verify refresh JWT
@@ -46,9 +54,9 @@ export const verifyRefreshJwt = (token) => {
   }
 };
 
-export const getTokens = (email) => {
-  return {
-    accessJWT: signAccessJwt(email),
-    refreshJWT: signRefreshJwt(email),
-  };
+export const getTokens = async (email) => {
+  const accessJWT = await signAccessJwt(email);
+  const refreshJWT = await signRefreshJwt(email);
+
+  return { accessJWT, refreshJWT };
 };

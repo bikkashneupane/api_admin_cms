@@ -157,7 +157,7 @@ router.delete("/:_id?", auth, async (req, res, next) => {
 
     if (product?._id) {
       // delete the images from cloudinary
-      await deleteCloudinaryImage(products.images);
+      await deleteCloudinaryImage(product.images);
       return res.json({
         status: "success",
         message: "Delete Success",

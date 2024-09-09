@@ -1,7 +1,7 @@
 import sessionSchema from "./sessionSchema.js";
 
 // create new Token
-export const insertSession = (obj) => sessionSchema(obj).save();
+export const insertSession = async (obj) => await sessionSchema(obj).save();
 
 // find Token
 export const findSession = (filter) => {

@@ -13,7 +13,7 @@ export const getAUser = (filter) => {
 
 // update user
 export const updateUser = async (filter, obj) => {
-  return userSchema.findOneAndUpdate(filter, obj);
+  return await userSchema.findOneAndUpdate(filter, obj);
 };
 
 // delete user
