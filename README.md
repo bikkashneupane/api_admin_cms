@@ -1,30 +1,59 @@
-# Login registration workflow
+# Vikiamy's Admin CMS - Backend
 
-The workflow below explains step how to a build robust registeration process step by step
+The backend for [Vikiamy's Admin CMS](https://vikiasmy-admin.bikashneupane.com/) provides a robust API for managing products and user data in a secure and efficient manner. Built with Node.js, Express, and MongoDB, this backend features secure authentication and a dynamic content management system.
 
-# Step 1
+## Features:
 
-Creatinfg user and sending verification link to user email
+- **RESTful API:** Handle product and user management with efficient API endpoints.
+- **User Authentication:** Secure access with JWT-based authentication.
+- **Data Management:** CRUD operations for products and users with validation.
+- **Secure and Scalable:** Built with Node.js and MongoDB for high performance.
 
-1. FE: Send user form to backend
-2. BE: receive user and do the following:
-   -- get the password and encrypt
-   -- create unique code and store it in the session table with email
-   -- format url like `http://yourdomain.com/verify-user?c=qwem234&email.com`
-   -- send the above link to the user email
-3. BE: insert user to the user table
-4. BE: response user saying check their email to verify the account
+## Tech Stack:
 
-# Step 2
+- **Node.js:** JavaScript runtime for server-side development.
+- **Express:** Fast web framework for building APIs.
+- **MongoDB:** NoSQL database for storing product and user data.
+- **JWT:** JSON Web Tokens for secure user authentication.
+- **Bcrypt:** Library for hashing passwords.
+- **Joi:** Validation library for incoming data requests.
 
-For user, opening email and following instruction to click the link received
+## Installation:
 
-1. FE: User clicks the link in their email and redirected to our webpage `http://yourdomain.com/verify-user?c=qwem234&email.com`
-2. FE: Within our `verify-user` page, reveive the `c` & `e` from the query string
-3. FE: Send the `c` & `e` to the server to verify
-4. BE: Create new API endpoint to receive the `c` & `e`
-5. BE: Verify `c` & `e` is exist in the session table and valid
-   -- if valid, update user status to active and also `isEmailVerified: true`
-   -- then send email notifying the account has been activated
-   -- verify user the same
-   -- else, the link is invalid
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/bikkashneupane/api_admin_cms
+   ```
+
+2. Navigate to the project directory:
+
+   ```bash
+      cd api_admin_cms
+   ```
+
+3. Install dependencies:
+
+   ```bash
+      yarn install
+   ```
+
+   or
+
+   ```bash
+      npm install
+   ```
+
+4. Set up environment variables: Create a .env file with the following variables:
+
+5. Run the server:
+
+   ```bash
+   yarn start
+   ```
+
+   or
+
+   ```bash
+   npm start
+   ```
