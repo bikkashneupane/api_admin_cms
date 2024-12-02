@@ -1,6 +1,6 @@
 # Vikiamy's Admin CMS - Backend
 
-The backend for [Vikiamy's Admin CMS](https://vikiasmy-admin.bikashneupane.com/) provides a robust API for managing products and user data in a secure and efficient manner. Built with Node.js, Express, and MongoDB, this backend features secure authentication and a dynamic content management system.
+The backend for [Vikiamy's Admin CMS](https://vikiasmy-watches-admin-cms.vercel.app) provides a robust API for managing products and user data in a secure and efficient manner. Built with Node.js, Express, and MongoDB, this backend features secure authentication and a dynamic content management system.
 
 ## Features:
 
